@@ -1,0 +1,28 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Directory to install Qt
+        dir: . # optional
+        # Version of Qt to install
+        version: 5.15.0 # optional, default is 5.12.9
+        
+    - name: Build
+      run: |
+        ./Qt/5.15.0/gcc_64/bin/qmake *.pro
+        make -j4

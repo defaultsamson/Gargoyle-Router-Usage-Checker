@@ -39,11 +39,11 @@ jobs:
       with:
         # Version of Qt to install
         version: 5.15.0 # optional, default is 5.12.9
-        arch: win64_mingw73
+        arch: win64_mingw81
         
     - name: Build
       run: | 
         ../Qt/5.15.0/win64_mingw73/bin/qmake *.pro
-        ../Qt/mingw730_64/mingw32-make.exe
+        ../Qt/Tools/mingw7810_64/mingw32-make.exe
   
   

@@ -42,15 +42,8 @@ jobs:
         arch: win64_mingw81
         
     - name: Build
-      run: | 
+      run: | # cd ../Qt/Tools/mingw810_64/bin
         ../Qt/5.15.0/mingw81_64/bin/qmake.exe *.pro
-        cd ../Qt
-        dir
-        cd Tools
-        dir
-        cd mingw810_64
-        dir
-        cd bin
-        dir
+        make
   
   

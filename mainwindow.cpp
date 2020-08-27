@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 
 #include <QMenu>
+#include <QMouseEvent>
+
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -18,6 +21,17 @@ MainWindow::MainWindow(QWidget *parent)
             this, SLOT(showContextMenu(const QPoint &)));
 }
 
+/// Records the initial oldRelativePos upon dragging
+void MainWindow::mousePressEvent(QMouseEvent *evt) {
+    if (evt->button() == Qt::LeftButton) oldRelativePos = evt->pos();
+}
+
+/// Moves the window to the moise pos subtracted by the oldRelativePos
+void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
+    move(evt->globalPos().x() - oldRelativePos.x(), evt->globalPos().y() - oldRelativePos.y());
+}
+
+/// Shows the right click menu.
 void MainWindow::showContextMenu(const QPoint &pos) {
     QMenu contextMenu(tr("Context menu"), this);
 

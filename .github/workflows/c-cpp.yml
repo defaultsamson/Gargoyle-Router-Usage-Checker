@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  Linux:
 
     runs-on: ubuntu-latest
 
@@ -26,3 +26,24 @@ jobs:
       run: |
         ./Qt/5.15.0/gcc_64/bin/qmake *.pro
         make -j4
+
+  Windows:
+    
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Version of Qt to install
+        version: 5.15.0 # optional, default is 5.12.9
+        arch: win64_mingw73
+        
+    - name: Build
+      run: | 
+        ../Qt/5.15.0/win64_mingw73/bin/qmake *.pro
+        ../Qt/mingw730_64/mingw32-make.exe
+  
+  

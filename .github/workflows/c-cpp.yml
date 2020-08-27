@@ -1,0 +1,53 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  QT_VERSION: 5.15.0 
+
+jobs:
+     
+  Linux:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Directory to install Qt
+        dir: . # optional
+        # Version of Qt to install
+        version: ${{ env.QT_VERSION }} # optional, default is 5.12.9
+        
+    - name: Build
+      run: |
+        ./Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake *.pro
+        make -j4
+
+  Windows:
+    
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2.7.2
+      with:
+        # Version of Qt to install
+        version: ${{ env.QT_VERSION }} # optional, default is 5.12.9
+        arch: win64_mingw81
+        
+    - name: Build
+      run: | # cd ../Qt/Tools/mingw810_64/bin
+        ../Qt/${{ env.QT_VERSION }}/mingw*/bin/qmake.exe *.pro
+        make -j4
+  
+  

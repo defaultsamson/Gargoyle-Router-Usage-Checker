@@ -17,5 +17,10 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+private slots:
+    void showContextMenu(const QPoint &pos);
+    void updateData();
+    void openOptions();
 };
 #endif // MAINWINDOW_H

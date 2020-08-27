@@ -19,12 +19,14 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *evt);
     void mouseMoveEvent(QMouseEvent *evt);
+    void mouseReleaseEvent(QMouseEvent *event);
 
 private:
     Ui::MainWindow *ui;
 
     /// Used for keeping track of dragging the window
     QPoint oldRelativePos;
+    bool dragStarted = false;
 
 private slots:
     void showContextMenu(const QPoint &pos);

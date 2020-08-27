@@ -4,8 +4,6 @@
 #include <QMenu>
 #include <QMouseEvent>
 
-#include <iostream>
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -23,12 +21,19 @@ MainWindow::MainWindow(QWidget *parent)
 
 /// Records the initial oldRelativePos upon dragging
 void MainWindow::mousePressEvent(QMouseEvent *evt) {
-    if (evt->button() == Qt::LeftButton) oldRelativePos = evt->pos();
+    if (evt->button() == Qt::LeftButton) {
+        oldRelativePos = evt->pos();
+        dragStarted = true;
+    }
 }
 
-/// Moves the window to the moise pos subtracted by the oldRelativePos
+/// Moves the window to the mouse pos subtracted by the oldRelativePos
 void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
-    move(evt->globalPos().x() - oldRelativePos.x(), evt->globalPos().y() - oldRelativePos.y());
+    if (dragStarted) move(evt->globalPos().x() - oldRelativePos.x(), evt->globalPos().y() - oldRelativePos.y());
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
+    if (evt->button() == Qt::LeftButton) dragStarted = false;
 }
 
 /// Shows the right click menu.

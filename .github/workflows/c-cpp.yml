@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ master ]
 
-env:
-  QT_VERSION: 5.15.0 
-
 jobs:
      
   Linux:
@@ -24,11 +21,11 @@ jobs:
         # Directory to install Qt
         dir: . # optional
         # Version of Qt to install
-        version: ${QT_VERSION} # optional, default is 5.12.9
+        version: 5.15.0 # optional, default is 5.12.9
         
     - name: Build
       run: |
-        ./Qt/${QT_VERSION}/gcc_64/bin/qmake *.pro
+        ./Qt/5.15.0/gcc_64/bin/qmake *.pro
         make -j4
 
   Windows:
@@ -42,12 +39,12 @@ jobs:
       uses: jurplel/install-qt-action@v2.7.2
       with:
         # Version of Qt to install
-        version: ${QT_VERSION} # optional, default is 5.12.9
+        version: 5.15.0 # optional, default is 5.12.9
         arch: win64_mingw81
         
     - name: Build
       run: | # cd ../Qt/Tools/mingw810_64/bin
-        ../Qt/${QT_VERSION}/mingw*/bin/qmake.exe *.pro
+        ../Qt/5.15.0/mingw*/bin/qmake.exe *.pro
         make -j4
   
   

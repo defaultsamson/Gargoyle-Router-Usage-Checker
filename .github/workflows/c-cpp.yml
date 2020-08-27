@@ -44,6 +44,12 @@ jobs:
     - name: Build
       run: | 
         ../Qt/5.15.0/mingw81_64/bin/qmake.exe *.pro
+        cd ../Qt
+        dir
+        cd ../Qt/Tools
+        dir
+        cd ../Qt/Tools/mingw810_64
+        dir
         cd ../Qt/Tools/mingw810_64/bin
         dir
   

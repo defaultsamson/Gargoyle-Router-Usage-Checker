@@ -6,6 +6,9 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Sets window as borderless
+    setWindowFlag(Qt::FramelessWindowHint);
 }
 
 MainWindow::~MainWindow()

@@ -37,6 +37,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_5">
+         <property name="text">
+          <string>Open window at previous location</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox_2">
          <property name="text">
           <string>Dark theme</string>
@@ -96,7 +103,7 @@
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string>Gargoyle router URL:</string>
+            <string>Gargoyle router IP:</string>
            </property>
           </widget>
          </item>

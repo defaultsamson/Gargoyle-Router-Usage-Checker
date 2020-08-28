@@ -20,13 +20,15 @@ SOURCES += \
     gargoyleparser.cpp \
     gargoyleprofile.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    settings.cpp
 
 HEADERS += \
     dialogsettings.h \
     gargoyleparser.h \
     gargoyleprofile.h \
-    mainwindow.h
+    mainwindow.h \
+    settings.h
 
 FORMS += \
     dialogsettings.ui \

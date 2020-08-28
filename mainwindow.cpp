@@ -3,8 +3,11 @@
 
 #include <QMenu>
 #include <QMouseEvent>
+#include <QCloseEvent>
+#include <QShowEvent>
 
 #include "dialogsettings.h"
+#include "settings.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -38,6 +41,17 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
     if (evt->button() == Qt::LeftButton) dragStarted = false;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event) {
+    // Save the _main window sizes
+    Settings::PREV_GEOMETRY.setValue(saveGeometry());
+}
+
+void MainWindow::showEvent(QShowEvent *event) {
+    // Reloads previous window location, if set to do so
+    if (Settings::RELOAD_LOCATION.value().toBool() &&  Settings::PREV_GEOMETRY.hasValue())
+        restoreGeometry(Settings::PREV_GEOMETRY.value().toByteArray());
+}
+
 /// Shows the right click menu.
 void MainWindow::showContextMenu(const QPoint &pos) {
     QMenu contextMenu(tr("Context menu"), this);
@@ -69,5 +83,7 @@ void MainWindow::openOptions() {
 MainWindow::~MainWindow()
 {
     delete ui;
+
+    delete Settings::QSETTINGS;
 }
 

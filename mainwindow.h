@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QMouseEvent>
+#include <QCloseEvent>
+#include <QShowEvent>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,6 +22,9 @@ protected:
     void mousePressEvent(QMouseEvent *evt);
     void mouseMoveEvent(QMouseEvent *evt);
     void mouseReleaseEvent(QMouseEvent *event);
+
+    void closeEvent(QCloseEvent *event);
+    void showEvent(QShowEvent *event);
 
 private:
     Ui::MainWindow *ui;

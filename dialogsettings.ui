@@ -30,35 +30,35 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="checkBoxOtherWindows">
          <property name="text">
           <string>Display above other windows</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_5">
+        <widget class="QCheckBox" name="checkBoxSaveGeometry">
          <property name="text">
           <string>Open window at previous location</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="checkBoxDarkTheme">
          <property name="text">
           <string>Dark theme</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_3">
+        <widget class="QCheckBox" name="checkBoxShowBar">
          <property name="text">
           <string>Show quota progression bar</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox_4">
+        <widget class="QCheckBox" name="checkBoxShowGraph">
          <property name="text">
           <string>Show graph</string>
          </property>

@@ -107,7 +107,7 @@ void MainWindow::updateData() {
 }
 
 void MainWindow::openOptions() {
-    DialogSettings s;
+    DialogSettings s(this);
     s.exec();
 }
 

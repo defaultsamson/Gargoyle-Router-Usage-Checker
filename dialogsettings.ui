@@ -74,7 +74,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox"/>
+          <widget class="QSpinBox" name="spinBoxSeconds"/>
          </item>
          <item>
           <widget class="QLabel" name="label_2">
@@ -108,7 +108,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="lineEditIP">
            <property name="placeholderText">
             <string>e.g. 192.168.0.1</string>
            </property>

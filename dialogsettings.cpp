@@ -23,6 +23,10 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->checkBoxDarkTheme->setChecked(Settings::DARK_THEME.value().toBool());
     ui->checkBoxShowBar->setChecked(Settings::SHOW_QUOTA.value().toBool());
     ui->checkBoxShowGraph->setChecked(Settings::SHOW_GRAPH.value().toBool());
+
+    ui->spinBoxSeconds->setValue(Settings::UPDATE_SECONDS.value().toInt());
+    ui->spinBoxSeconds->setRange(1, 60 * 10);
+    ui->lineEditIP->setText(Settings::ROUTER_IP.value().toString());
 }
 
 /// Manually updates the width of the columns in the grid, because resizing the columns is broken
@@ -58,6 +62,10 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::DARK_THEME.setValue(ui->checkBoxDarkTheme->isChecked());
     Settings::SHOW_QUOTA.setValue(ui->checkBoxShowBar->isChecked());
     Settings::SHOW_GRAPH.setValue(ui->checkBoxShowGraph->isChecked());
+
+    Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
+    Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
+
     close();
 }
 

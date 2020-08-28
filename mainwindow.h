@@ -18,6 +18,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void setDarkTheme(bool set = true);
+
 protected:
     void mousePressEvent(QMouseEvent *evt);
     void mouseMoveEvent(QMouseEvent *evt);
@@ -28,6 +30,9 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+
+    QPalette darkPalette;
+    QPalette defaultPalette;
 
     /// Used for keeping track of dragging the window
     QPoint oldRelativePos;

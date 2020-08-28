@@ -18,6 +18,7 @@ public:
     static Settings DARK_THEME;
     static Settings SHOW_QUOTA;
     static Settings SHOW_GRAPH;
+
     static Settings UPDATE_SECONDS;
     static Settings ROUTER_IP;
 

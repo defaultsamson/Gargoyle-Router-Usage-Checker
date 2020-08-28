@@ -4,6 +4,8 @@
 #include <QMenu>
 #include <QMouseEvent>
 
+#include "dialogsettings.h"
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -44,7 +46,7 @@ void MainWindow::showContextMenu(const QPoint &pos) {
     connect(&action1, SIGNAL(triggered()), this, SLOT(updateData()));
     contextMenu.addAction(&action1);
 
-    QAction action2("Options", this);
+    QAction action2("Settings", this);
     connect(&action2, SIGNAL(triggered()), this, SLOT(openOptions()));
     contextMenu.addAction(&action2);
 
@@ -60,7 +62,8 @@ void MainWindow::updateData() {
 }
 
 void MainWindow::openOptions() {
-
+    DialogSettings s;
+    s.exec();
 }
 
 MainWindow::~MainWindow()

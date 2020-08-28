@@ -5,20 +5,36 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QEventLoop>
+#include <regex>
 
 GargoyleParser::GargoyleParser()
 {
 
 }
 
-void GargoyleParser::update(QString url, QList<GargoyleProfile> profiles)
+bool GargoyleParser::update(QString url, QList<GargoyleProfile> profiles)
 {
-    QUrl url = QUrl("http://192.168.1.1");
+    // Set up network manager
     QNetworkAccessManager manager;
+    manager.setTransferTimeout(timeout);
+
+    // Set up request and reply
     QNetworkRequest request(url);
     QNetworkReply *reply(manager.get(request));
+
+    // Wait for reply
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
-    qDebug(reply->readAll());
+
+    if (reply->error() != 0)
+    {
+        qDebug("Network error while updating: %u", reply->error());
+        return false;
+    }
+
+    QString html = reply->readAll();
+    qDebug(qUtf8Printable(html));
+
+    return true;
 }

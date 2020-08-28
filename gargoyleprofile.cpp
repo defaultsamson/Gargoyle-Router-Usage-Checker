@@ -1,10 +1,10 @@
 #include "gargoyleprofile.h"
 
-GargoyleProfile::GargoyleProfile(int ip, Usage usage) : GargoyleProfile(ip, ip, usage)
+GargoyleProfile::GargoyleProfile(uint32_t ip, Usage usage) : GargoyleProfile(ip, ip, usage)
 {
 }
 
-GargoyleProfile::GargoyleProfile(int minIp, int maxIp, Usage usage)
+GargoyleProfile::GargoyleProfile(uint32_t minIp, uint32_t maxIp, Usage usage)
 {
     // Set up the IP range
     this->minIp = minIp;
@@ -20,12 +20,12 @@ bool GargoyleProfile::operator==(GargoyleProfile profile) const noexcept
     return this->minIp == profile.minIp && this->maxIp == profile.maxIp;
 }
 
-bool GargoyleProfile::equals(int minIp, int maxIp) const
+bool GargoyleProfile::equals(uint32_t minIp, uint32_t maxIp) const
 {
     return this->minIp == minIp && this->maxIp == maxIp;
 }
 
-bool GargoyleProfile::containsIp(int ip) const
+bool GargoyleProfile::containsIp(uint32_t ip) const
 {
     return ip >= minIp && ip <= maxIp;
 }
@@ -49,12 +49,12 @@ Usage GargoyleProfile::getLastUsage() const
     return lastUsage;
 }
 
-uintmax_t GargoyleProfile::getUsageDelta() const
+intmax_t GargoyleProfile::getUsageDelta() const
 {
     return usageDelta;
 }
 
-uintmax_t GargoyleProfile::getTimeDelta() const
+intmax_t GargoyleProfile::getTimeDelta() const
 {
     return timeDelta;
 }

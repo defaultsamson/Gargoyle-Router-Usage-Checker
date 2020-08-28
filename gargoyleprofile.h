@@ -15,19 +15,20 @@ public:
     /// Whether this profile was updated last time it was fetched
     bool updated;
 
-    ///
+    /// Whether this profile is the current device's profile
+    bool deviceProfile;
 
     /// Profile name for display
     QString name;
 
     /// Shortcut for single IP
-    GargoyleProfile(int ip, Usage usage);
-    GargoyleProfile(int minIp, int maxIp, Usage usage);
+    GargoyleProfile(uint32_t ip, Usage usage);
+    GargoyleProfile(uint32_t minIp, uint32_t maxIp, Usage usage);
 
     bool operator==(GargoyleProfile profile) const noexcept;
-    bool equals(int minIp, int maxIp) const;
+    bool equals(uint32_t minIp, uint32_t maxIp) const;
 
-    bool containsIp(int ip) const;
+    bool containsIp(uint32_t ip) const;
 
     /// Sets the new usage and calculates the usage speed
     void setUsage(Usage usage);
@@ -37,15 +38,15 @@ public:
     /// Returns the last usage
     Usage getLastUsage() const;
 
-    uintmax_t getUsageDelta() const;
-    uintmax_t getTimeDelta() const;
+    intmax_t getUsageDelta() const;
+    intmax_t getTimeDelta() const;
 
 private:
     /// The profile minimum and maximum IPs
-    int minIp, maxIp;
+    uint32_t minIp, maxIp;
 
     Usage currentUsage, lastUsage;
-    uintmax_t usageDelta, timeDelta;
+    intmax_t usageDelta, timeDelta;
 };
 
 #endif // GARGOYLEPROFILE_H

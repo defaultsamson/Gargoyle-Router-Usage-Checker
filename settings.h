@@ -17,6 +17,7 @@ public:
     static Settings RELOAD_LOCATION;
     static Settings DARK_THEME;
     static Settings SHOW_QUOTA;
+    static Settings SNAP_THRESHOLD;
     static Settings SHOW_GRAPH;
 
     static Settings UPDATE_SECONDS;

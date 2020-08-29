@@ -23,8 +23,13 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->checkBoxShowBar->setChecked(Settings::SHOW_QUOTA.value().toBool());
     ui->checkBoxShowGraph->setChecked(Settings::SHOW_GRAPH.value().toBool());
 
+    const int MAX_SNAP_DISTANCE = 500;
+    ui->horizontalSliderSnap->setRange(0, MAX_SNAP_DISTANCE);
+    ui->horizontalSliderSnap->setValue(Settings::SNAP_THRESHOLD.value().toInt());
+    ui->spinBoxSnap->setRange(0, MAX_SNAP_DISTANCE);
+    ui->spinBoxSnap->setValue(Settings::SNAP_THRESHOLD.value().toInt());
     ui->spinBoxSeconds->setValue(Settings::UPDATE_SECONDS.value().toInt());
-    ui->spinBoxSeconds->setRange(1, 60 * 10);
+    ui->spinBoxSeconds->setRange(1, 60 * 60); // From 1 second to 1 hour between updates
     ui->lineEditIP->setText(Settings::ROUTER_IP.value().toString());
 
     // Test data
@@ -92,6 +97,7 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::SHOW_QUOTA.setValue(ui->checkBoxShowBar->isChecked());
     Settings::SHOW_GRAPH.setValue(ui->checkBoxShowGraph->isChecked());
 
+    Settings::SNAP_THRESHOLD.setValue(ui->spinBoxSnap->value());
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
@@ -104,4 +110,14 @@ void DialogSettings::on_checkBoxDarkTheme_stateChanged(int state)
 {
     // Temporarily change dark theme
     main->setDarkTheme(state == Qt::CheckState::Checked);
+}
+
+void DialogSettings::on_horizontalSliderSnap_sliderMoved(int value)
+{
+    ui->spinBoxSnap->setValue(value);
+}
+
+void DialogSettings::on_spinBoxSnap_valueChanged(int value)
+{
+    ui->horizontalSliderSnap->setValue(value);
 }

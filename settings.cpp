@@ -28,6 +28,7 @@ Settings Settings::RELOAD_LOCATION = Settings("open_at_prev_location", true);
 Settings Settings::DARK_THEME = Settings("dark_theme", true);
 Settings Settings::SHOW_QUOTA = Settings("show_quota_bar", true);
 Settings Settings::SHOW_GRAPH = Settings("show_graph", true);
+Settings Settings::SNAP_THRESHOLD = Settings("snap_threshold", 20);
 Settings Settings::UPDATE_SECONDS = Settings("update_seconds", 5);
 Settings Settings::ROUTER_IP = Settings("router_ip");
 

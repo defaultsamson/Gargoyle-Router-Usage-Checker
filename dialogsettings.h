@@ -29,6 +29,10 @@ private slots:
 
     void on_checkBoxDarkTheme_stateChanged(int arg1);
 
+    void on_horizontalSliderSnap_sliderMoved(int position);
+
+    void on_spinBoxSnap_valueChanged(int arg1);
+
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;

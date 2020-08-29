@@ -48,7 +48,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
     {
         QString line = reply->readLine();
 
-        GargoyleLineType lineType = GargoyleLineType::NONE;
+        GargoyleLineType lineType;
 
         // Identify line type
         if (line.startsWith("var connectedIp", Qt::CaseInsensitive))
@@ -57,6 +57,8 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
             lineType = GargoyleLineType::QUOTA_LIMITS;
         else if (line.startsWith("quotaUsed", Qt::CaseInsensitive))
             lineType = GargoyleLineType::QUOTA_USED;
+        else
+            continue;
 
         switch (lineType)
         {
@@ -236,7 +238,7 @@ QVector<QStringRef> GargoyleParser::squareBracketSections(const QString &string)
     return sections;
 }
 
-QString GargoyleParser::cleanString(QString string)
+QString GargoyleParser::cleanString(const QString string)
 {
     QString cleaned;
 
@@ -249,7 +251,7 @@ QString GargoyleParser::cleanString(QString string)
     return cleaned;
 }
 
-uint32_t GargoyleParser::parseIp(QStringRef ip)
+uint32_t GargoyleParser::parseIp(const QStringRef ip)
 {
     uint32_t intIp = 0;
 

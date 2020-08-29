@@ -15,7 +15,7 @@ enum GargoyleLineType
 class GargoyleParser
 {
     /// Splits the string into the sections surrounded by square brackets
-    QVector<QStringRef> squareBracketSections(QString string);
+    QVector<QStringRef> squareBracketSections(const QString &string);
 
     /// Removes any characters other than 0-9, '.', '-', ',', '[', and ']'
     QString cleanString(QString string);

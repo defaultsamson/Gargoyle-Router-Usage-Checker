@@ -77,7 +77,8 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
         case GargoyleLineType::QUOTA_USED:
         {
             // Remove extra characters and split into sections between brackets
-            QVector<QStringRef> sections = squareBracketSections(cleanString(line));
+            QString clean = cleanString(line);
+            QVector<QStringRef> sections = squareBracketSections(clean);
 
             // Expected format: [Profile ID, IP Range, Data]
             if (sections.size() == 3)
@@ -211,7 +212,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
     return true;
 }
 
-QVector<QStringRef> GargoyleParser::squareBracketSections(QString string)
+QVector<QStringRef> GargoyleParser::squareBracketSections(const QString &string)
 {
     QVector<QStringRef> sections;
 

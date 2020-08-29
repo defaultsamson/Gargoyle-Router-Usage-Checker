@@ -24,6 +24,7 @@ SOURCES += \
     settings.cpp
 
 HEADERS += \
+    IPUtil.h \
     dialogsettings.h \
     gargoyleparser.h \
     gargoyleprofile.h \

@@ -6,6 +6,8 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 
+#include "IPUtil.h"
+
 GargoyleParser::GargoyleParser()
 {
 
@@ -69,7 +71,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
             int start = line.indexOf('"') + 1;
             int end = line.lastIndexOf('"');
 
-            currentIp = parseIp(line.midRef(start, end - start));
+            currentIp = IPUtil::parseIp(line.midRef(start, end - start));
 
             //qDebug("Your IP: %d.%d.%d.%d", (currentIp >> 24) & 255, (currentIp >> 16) & 255, (currentIp >> 8) & 255, currentIp & 255);
             break;
@@ -97,14 +99,14 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
                     // If there's only one IP, not a range, make a range of one IP
                     if (range.size() == 1)
                     {
-                        minIp = parseIp(range[0]);
+                        minIp = IPUtil::parseIp(range[0]);
                         maxIp = minIp;
                     }
                     // Parse the IP range into min and max IPs
                     else if (range.size() == 2)
                     {
-                        minIp = parseIp(range[0]);
-                        maxIp = parseIp(range[1]);
+                        minIp = IPUtil::parseIp(range[0]);
+                        maxIp = IPUtil::parseIp(range[1]);
                     }
                     // Otherwise if there's an unexpected number of IPs, give up
                     else
@@ -113,7 +115,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
                     }
 
                     // Create a range key for the map
-                    uint64_t rangeKey = createIpRange(minIp, maxIp);
+                    uint64_t rangeKey = IPUtil::createIpRange(minIp, maxIp);
                     // Get the download usage
                     uint64_t downloadData = dataVals[1].toULongLong();
 
@@ -199,7 +201,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
         if (!foundProfile)
         {
             GargoyleProfile* profile = new GargoyleProfile(rangeUsage);
-            QString ipRange = ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
+            QString ipRange = IPUtil::ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
             profile->name = ipRange; // TODO try and load from settings
             profile->displayIpRange = ipRange;
 
@@ -249,39 +251,4 @@ QString GargoyleParser::cleanString(const QString string)
     }
 
     return cleaned;
-}
-
-uint32_t GargoyleParser::parseIp(const QStringRef ip)
-{
-    uint32_t intIp = 0;
-
-    for (QStringRef subnet : ip.split('.'))
-    {
-        // Shift by 8 bits for each byte
-        intIp <<= 8;
-
-        // Add this level of subnet
-        intIp |= subnet.toInt();
-    }
-
-    return intIp;
-}
-
-uint64_t GargoyleParser::createIpRange(uint32_t minIp, uint32_t maxIp)
-{
-    uint64_t ipRange = maxIp;
-    ipRange = (ipRange << 32) | minIp;
-
-    return ipRange;
-}
-
-QString GargoyleParser::ipRangeToString(uint32_t minIp, uint32_t maxIp)
-{
-    if (minIp == maxIp)
-        return QString::asprintf("%d.%d.%d.%d",
-                                 (minIp >> 24) & 255, (minIp >> 16) & 255, (minIp >> 8) & 255, minIp & 255);
-
-    return QString::asprintf("%d.%d.%d.%d - %d.%d.%d.%d",
-                             (minIp >> 24) & 255, (minIp >> 16) & 255, (minIp >> 8) & 255, minIp & 255,
-                             (maxIp >> 24) & 255, (maxIp >> 16) & 255, (maxIp >> 8) & 255, maxIp & 255);
 }

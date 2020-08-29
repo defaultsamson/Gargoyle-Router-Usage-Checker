@@ -19,15 +19,6 @@ class GargoyleParser
     /// Removes any characters other than 0-9, '.', '-', ',', '[', and ']'
     QString cleanString(const QString string);
 
-    /// Parses a string IP representation to an integer
-    uint32_t parseIp(const QStringRef ip);
-
-    /// Creates an IP range in a 64 bit integer rather than two 32 bit integers
-    uint64_t createIpRange(uint32_t minIp, uint32_t maxIp);
-
-    /// Creates a string representation of an IP range
-    QString ipRangeToString(uint32_t minIp, uint32_t maxIp);
-
 public:
     uint32_t timeout = 5000;
 

@@ -17,6 +17,8 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Fixed);
 
+    originalDarkTheme = Settings::DARK_THEME.value().toBool();
+
     ui->checkBoxOtherWindows->setChecked(Settings::DISPLAY_ABOVE.value().toBool());
     ui->checkBoxSaveGeometry->setChecked(Settings::RELOAD_LOCATION.value().toBool());
     ui->checkBoxDarkTheme->setChecked(Settings::DARK_THEME.value().toBool());
@@ -81,12 +83,12 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::on_buttonBox_rejected()
 {
-    main->loadSettings();
+    main->setDarkTheme(originalDarkTheme);
     close();
 }
 
 void DialogSettings::closeEvent(QCloseEvent *event) {
-    main->loadSettings();
+    main->setDarkTheme(originalDarkTheme);
 }
 
 void DialogSettings::on_buttonBox_accepted()

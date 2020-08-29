@@ -37,6 +37,8 @@ private:
     Ui::DialogSettings *ui;
     MainWindow *main;
 
+    bool originalDarkTheme;
+
     void updateGridWidth();
 };
 

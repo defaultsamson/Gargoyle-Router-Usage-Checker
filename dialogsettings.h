@@ -4,6 +4,7 @@
 #include "mainwindow.h"
 #include <QDialog>
 #include <QTableWidgetItem>
+#include <QCheckBox>
 
 namespace Ui {
 class DialogSettings;
@@ -36,6 +37,8 @@ private slots:
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;
+    QList <QCheckBox*> checkboxes;
+
     /// The index of the column containing checkboxes
     const int COL_CHECKBOX = 0;
     /// The index of the column containing the ip ranges

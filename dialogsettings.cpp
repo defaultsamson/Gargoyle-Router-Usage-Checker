@@ -6,6 +6,7 @@
 
 #include <QHeaderView>
 #include <QTableWidgetItem>
+#include <algorithm>
 
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
@@ -43,28 +44,31 @@ DialogSettings::DialogSettings(MainWindow *main) :
         t->insertRow(i);
         QCheckBox *checkBox = new QCheckBox();
         checkBox->setChecked(profile->showInGraph);
+        checkboxes.append(checkBox);
 
         QHBoxLayout *layout = new QHBoxLayout();
         layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(checkBox);
+        layout->setAlignment(Qt::AlignCenter);
+
 
         QWidget *widget = new QWidget();
-        widget->setContentsMargins(6, 0, 0, 0);
+        widget->setContentsMargins(0, 0, 0, 0);
         widget->setLayout(layout);
 
         t->setCellWidget(i, COL_CHECKBOX, widget);
         t->setCellWidget(i, COL_IP_RANGE, new QLabel(profile->displayIpRange));
         t->setItem(i, COL_NAME, new QTableWidgetItem(profile->name));
-        //t->item(i, COL_NAME)->setTextAlignment(Qt::AlignCenter);
     }
 }
 
 /// Manually updates the width of the columns in the grid, because resizing the columns is broken
 void DialogSettings::updateGridWidth() {
     const int BUTTON_COLUMN = 20;
+    const double RANGE_MAX_SIZE = 230;
     int remainingWidth = ui->tableWidget->width() - BUTTON_COLUMN;
     ui->tableWidget->horizontalHeader()->resizeSection(0, BUTTON_COLUMN);
-    ui->tableWidget->horizontalHeader()->resizeSection(1, remainingWidth * 0.6); // Set IP Range to 60% of the remaining area
+    ui->tableWidget->horizontalHeader()->resizeSection(1, std::min(remainingWidth * 0.6, RANGE_MAX_SIZE)); // Set IP Range to 60% of the remaining area
     // Just set this size to 1, because the table is set to automatically fill out the final column
     ui->tableWidget->horizontalHeader()->resizeSection(2, 1);
 }

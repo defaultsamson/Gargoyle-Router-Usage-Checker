@@ -4,6 +4,14 @@
 #include "gargoyleprofile.h"
 #include <QList>
 
+enum GargoyleLineType
+{
+    NONE,
+    CURRENT_IP,
+    QUOTA_LIMITS,
+    QUOTA_USED
+};
+
 class GargoyleParser
 {
 public:

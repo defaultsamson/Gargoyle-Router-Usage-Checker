@@ -14,8 +14,8 @@ DialogSettings::DialogSettings(MainWindow *main) :
 {
     ui->setupUi(this);
 
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(COL_CHECKBOX, QHeaderView::ResizeMode::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(COL_IP_RANGE, QHeaderView::ResizeMode::Fixed);
 
     originalDarkTheme = Settings::DARK_THEME.value().toBool();
 
@@ -45,16 +45,17 @@ DialogSettings::DialogSettings(MainWindow *main) :
         checkBox->setChecked(profile->showInGraph);
 
         QHBoxLayout *layout = new QHBoxLayout();
+        layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(checkBox);
 
         QWidget *widget = new QWidget();
-        widget->setContentsMargins(0, 0, 0, 0);
+        widget->setContentsMargins(6, 0, 0, 0);
         widget->setLayout(layout);
 
-        t->setCellWidget(i, 0, checkBox);
-        t->setCellWidget(i, 1, new QLabel(profile->displayIpRange));
-        t->setItem(i, 2, new QTableWidgetItem(profile->name));
-        t->item(i, 2)->setTextAlignment(Qt::AlignCenter);
+        t->setCellWidget(i, COL_CHECKBOX, widget);
+        t->setCellWidget(i, COL_IP_RANGE, new QLabel(profile->displayIpRange));
+        t->setItem(i, COL_NAME, new QTableWidgetItem(profile->name));
+        //t->item(i, COL_NAME)->setTextAlignment(Qt::AlignCenter);
     }
 }
 

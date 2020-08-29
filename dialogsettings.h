@@ -36,7 +36,12 @@ private slots:
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;
-
+    /// The index of the column containing checkboxes
+    const int COL_CHECKBOX = 0;
+    /// The index of the column containing the ip ranges
+    const int COL_IP_RANGE = 1;
+    /// The index of the column containing the names
+    const int COL_NAME = 2;
     bool originalDarkTheme;
 
     void updateGridWidth();

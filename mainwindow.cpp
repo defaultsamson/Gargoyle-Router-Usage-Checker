@@ -8,6 +8,8 @@
 
 #include "dialogsettings.h"
 #include "settings.h"
+#include "gargoyleparser.h"
+#include "gargoyleprofile.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -103,6 +105,7 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::updateData() {
+    parser.update(Settings::ROUTER_IP.value().toString(), profiles);
 
 }
 

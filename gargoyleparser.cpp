@@ -11,7 +11,7 @@ GargoyleParser::GargoyleParser()
 
 }
 
-bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
+bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
 {
     // Set up network manager
     QNetworkAccessManager manager;
@@ -34,7 +34,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
     }
 
     // Set all profiles to not updated and not the current device
-    for (GargoyleProfile* profile : *profiles)
+    for (GargoyleProfile* profile : profiles)
     {
         profile->updated = false;
         profile->deviceProfile = false;
@@ -181,7 +181,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
     for (Usage rangeUsage : rangeUsages)
     {
         bool foundProfile = false;
-        for (GargoyleProfile* profile : *profiles)
+        for (GargoyleProfile* profile : profiles)
         {
             // If this range has a profile, set the usage
             if (profile->equals(rangeUsage.minIp, rangeUsage.maxIp))
@@ -198,12 +198,12 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*>* profiles)
             GargoyleProfile* profile = new GargoyleProfile(rangeUsage);
             profile->name = ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
 
-            profiles->append(profile);
+            profiles.append(profile);
         }
     }
 
     // Set the device profile
-    for (GargoyleProfile* profile : *profiles)
+    for (GargoyleProfile* profile : profiles)
     {
         if (profile->containsIp(currentIp))
             profile->deviceProfile = true;
@@ -272,6 +272,10 @@ uint64_t GargoyleParser::createIpRange(uint32_t minIp, uint32_t maxIp)
 
 QString GargoyleParser::ipRangeToString(uint32_t minIp, uint32_t maxIp)
 {
+    if (minIp == maxIp)
+        return QString::asprintf("%d.%d.%d.%d",
+                                 (minIp >> 24) & 255, (minIp >> 16) & 255, (minIp >> 8) & 255, minIp & 255);
+
     return QString::asprintf("%d.%d.%d.%d - %d.%d.%d.%d",
                              (minIp >> 24) & 255, (minIp >> 16) & 255, (minIp >> 8) & 255, minIp & 255,
                              (maxIp >> 24) & 255, (maxIp >> 16) & 255, (maxIp >> 8) & 255, maxIp & 255);

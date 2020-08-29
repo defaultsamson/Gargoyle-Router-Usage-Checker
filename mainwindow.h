@@ -1,6 +1,9 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "gargoyleparser.h"
+#include "gargoyleprofile.h"
+
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QCloseEvent>
@@ -37,6 +40,9 @@ private:
     /// Used for keeping track of dragging the window
     QPoint oldRelativePos;
     bool dragStarted = false;
+
+    GargoyleParser parser;
+    QList<GargoyleProfile*> profiles;
 
 private slots:
     void showContextMenu(const QPoint &pos);

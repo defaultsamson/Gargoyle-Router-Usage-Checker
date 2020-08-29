@@ -69,8 +69,6 @@ void MainWindow::loadSettings() {
 
     setWindowFlags(flags);
     show();
-
-    updateData();
 }
 
 void MainWindow::setDarkTheme(bool set) {

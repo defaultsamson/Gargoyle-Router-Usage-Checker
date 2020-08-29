@@ -35,7 +35,7 @@ public:
     GargoyleParser();
 
     /// Fetches the HTML of the Gargoyle page and parses the information into the profiles, appending new profiles as needed
-    bool update(QString url, QList<GargoyleProfile> profiles);
+    bool update(QString url, QList<GargoyleProfile*>* profiles);
 };
 
 #endif // GARGOYLEPARSER_H

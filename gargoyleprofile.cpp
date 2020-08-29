@@ -31,8 +31,8 @@ void GargoyleProfile::setUsage(Usage usage)
     lastUsage = currentUsage;
     currentUsage = usage;
 
-    usageDelta = lastUsage.current - currentUsage.current;
-    timeDelta = lastUsage.time - currentUsage.time;
+    usageDelta = currentUsage.current - lastUsage.current;
+    timeDelta = currentUsage.time - lastUsage.time;
 
     updated = true;
 }
@@ -52,7 +52,7 @@ int64_t GargoyleProfile::getUsageDelta() const
     return usageDelta;
 }
 
-int64_t GargoyleProfile::getTimeDelta() const
+std::chrono::nanoseconds GargoyleProfile::getTimeDelta() const
 {
     return timeDelta;
 }

@@ -2,11 +2,13 @@
 #define GARGOYLEPROFILE_H
 
 #include <QString>
+#include <chrono>
 
 struct Usage
 {
     uint32_t minIp, maxIp;
-    uint64_t time, current, max;
+    std::chrono::nanoseconds time;
+    uint64_t current, max;
 };
 
 class GargoyleProfile
@@ -37,7 +39,7 @@ public:
     Usage getLastUsage() const;
 
     int64_t getUsageDelta() const;
-    int64_t getTimeDelta() const;
+    std::chrono::nanoseconds getTimeDelta() const;
 
     uint32_t getMinIp() const;
     uint32_t getMaxIp() const;
@@ -47,7 +49,9 @@ private:
     uint32_t minIp, maxIp;
 
     Usage currentUsage, lastUsage;
-    int64_t usageDelta, timeDelta;
+
+    int64_t usageDelta;
+    std::chrono::nanoseconds timeDelta;
 };
 
 #endif // GARGOYLEPROFILE_H

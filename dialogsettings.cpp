@@ -88,16 +88,18 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::on_buttonBox_rejected()
 {
-    main->setDarkTheme(originalDarkTheme);
+    accepted = false;
     close();
 }
 
 void DialogSettings::closeEvent(QCloseEvent *event) {
-    main->setDarkTheme(originalDarkTheme);
+    if (!accepted) main->setDarkTheme(originalDarkTheme);
 }
 
 void DialogSettings::on_buttonBox_accepted()
 {
+    accepted = true;
+
     Settings::DISPLAY_ABOVE.setValue(ui->checkBoxOtherWindows->isChecked());
     Settings::RELOAD_LOCATION.setValue(ui->checkBoxSaveGeometry->isChecked());
     Settings::DARK_THEME.setValue(ui->checkBoxDarkTheme->isChecked());

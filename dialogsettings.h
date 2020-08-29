@@ -38,6 +38,7 @@ private:
     Ui::DialogSettings *ui;
     MainWindow *main;
     QList <QCheckBox*> checkboxes;
+    bool accepted = false;
 
     /// The index of the column containing checkboxes
     const int COL_CHECKBOX = 0;

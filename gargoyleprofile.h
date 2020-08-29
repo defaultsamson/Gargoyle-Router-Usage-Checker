@@ -2,28 +2,26 @@
 #define GARGOYLEPROFILE_H
 
 #include <QString>
-#include <cstdint>
 
 struct Usage
 {
-    uintmax_t time, current, max;
+    uint32_t minIp, maxIp;
+    uint64_t time, current, max;
 };
 
 class GargoyleProfile
 {
 public:
     /// Whether this profile was updated last time it was fetched
-    bool updated;
+    bool updated = true;
 
     /// Whether this profile is the current device's profile
-    bool deviceProfile;
+    bool deviceProfile = false;
 
     /// Profile name for display
     QString name;
 
-    /// Shortcut for single IP
-    GargoyleProfile(uint32_t ip, Usage usage);
-    GargoyleProfile(uint32_t minIp, uint32_t maxIp, Usage usage);
+    GargoyleProfile(Usage usage);
 
     bool operator==(GargoyleProfile profile) const noexcept;
     bool equals(uint32_t minIp, uint32_t maxIp) const;
@@ -38,15 +36,15 @@ public:
     /// Returns the last usage
     Usage getLastUsage() const;
 
-    intmax_t getUsageDelta() const;
-    intmax_t getTimeDelta() const;
+    int64_t getUsageDelta() const;
+    int64_t getTimeDelta() const;
 
 private:
     /// The profile minimum and maximum IPs
     uint32_t minIp, maxIp;
 
     Usage currentUsage, lastUsage;
-    intmax_t usageDelta, timeDelta;
+    int64_t usageDelta, timeDelta;
 };
 
 #endif // GARGOYLEPROFILE_H

@@ -40,13 +40,40 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile> profiles)
     }
 
     // For each HTML line, extract the current IP and profile data
+    QMap<uint64_t, Usage> rangeUsages;
+
     uint32_t currentIp;
     while(reply->canReadLine())
     {
         QString line = reply->readLine();
 
+        bool isLimit = false;
+        bool isUsed = false;
+
         // Quota info
-        if (line.startsWith("quotaUsed", Qt::CaseInsensitive))
+        if (line.startsWith("quotaLimits", Qt::CaseInsensitive))
+        {
+            isLimit = true;
+        }
+        else if (line.startsWith("quotaUsed", Qt::CaseInsensitive))
+        {
+            isUsed = true;
+        }
+        // Get current device IP
+        else if (line.startsWith("var connectedIp", Qt::CaseInsensitive))
+        {
+            int start = line.indexOf('"') + 1;
+            int end = line.lastIndexOf('"');
+
+            currentIp = parseIp(line.midRef(start, end - start));
+
+            qDebug("Your IP: %d.%d.%d.%d", (currentIp >> 24) & 255, (currentIp >> 16) & 255, (currentIp >> 8) & 255, currentIp & 255);
+
+            continue;
+        }
+
+        // Process quota info
+        if (isLimit || isUsed)
         {
             // Remove extra characters and split into sections between brackets
             QVector<QStringRef> sections = squareBracketSections(cleanString(line));
@@ -75,56 +102,57 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile> profiles)
                         continue;
                     }
 
-                    uintmax_t usage = usages[1].toULongLong();
+                    uint64_t rangeKey = createIpRange(minIp, maxIp);
+                    uint64_t data = usages[1].toULongLong();
 
-                    qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with usage" << usage;
-                }
-            }
-        }
-        else if (line.startsWith("quotaLimits", Qt::CaseInsensitive))
-        {
-            // Remove extra characters and split into sections between brackets
-            QVector<QStringRef> sections = squareBracketSections(cleanString(line));
-
-            if (sections.size() == 3)
-            {
-                QVector<QStringRef> limits = sections[2].split(',');
-
-                if (limits.size() == 3)
-                {
-                    QVector<QStringRef> range = sections[1].split('-');
-
-                    uint32_t minIp, maxIp;
-                    if (range.size() == 1)
+                    if (rangeUsages.contains(rangeKey))
                     {
-                        minIp = parseIp(range[0]);
-                        maxIp = minIp;
-                    }
-                    else if (range.size() == 2)
-                    {
-                        minIp = parseIp(range[0]);
-                        maxIp = parseIp(range[1]);
+                        if (isLimit)
+                            rangeUsages[rangeKey].max = data;
+                        else if (isUsed)
+                            rangeUsages[rangeKey].current = data;
                     }
                     else
                     {
-                        continue;
+                        Usage rangeUsage;
+
+                        rangeUsage.minIp = minIp;
+                        rangeUsage.maxIp = maxIp;
+
+                        if (isLimit)
+                            rangeUsage.max = data;
+                        else if (isUsed)
+                            rangeUsage.current = data;
+
+                        rangeUsages[rangeKey] = rangeUsage;
                     }
 
-                    uintmax_t limit = limits[1].toULongLong();
-
-                    qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with limit" << limit;
+                    if (isLimit)
+                        qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with limit" << data;
+                    else if (isUsed)
+                        qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with usage" << data;
                 }
             }
         }
-        // Get current device IP
-        else if (line.startsWith("var connectedIp", Qt::CaseInsensitive))
+    }
+
+    foreach (Usage rangeUsage, rangeUsages)
+    {
+        bool foundProfile = false;
+        foreach (GargoyleProfile profile, profiles)
         {
-            int start = line.indexOf('"') + 1;
-            int end = line.lastIndexOf('"');
+            if (profile.equals(rangeUsage.maxIp, rangeUsage.maxIp))
+            {
+                foundProfile = true;
+                profile.setUsage(rangeUsage);
+                break;
+            }
+        }
 
-            currentIp = parseIp(line.midRef(start, end - start));
-
-            qDebug("Your IP: %d.%d.%d.%d", (currentIp >> 24) & 255, (currentIp >> 16) & 255, (currentIp >> 8) & 255, currentIp & 255);
+        // If no profile is found, make a new one
+        if (!foundProfile)
+        {
+            profiles.append(GargoyleProfile(rangeUsage));
         }
     }
 
@@ -186,4 +214,14 @@ uint32_t GargoyleParser::parseIp(QStringRef ip)
     }
 
     return intIp;
+}
+
+uint64_t GargoyleParser::createIpRange(uint32_t minIp, uint32_t maxIp)
+{
+    uint64_t ipRange = maxIp;
+
+    ipRange <<= 32;
+    ipRange |= minIp;
+
+    return ipRange;
 }

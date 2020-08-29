@@ -1,14 +1,10 @@
 #include "gargoyleprofile.h"
 
-GargoyleProfile::GargoyleProfile(uint32_t ip, Usage usage) : GargoyleProfile(ip, ip, usage)
-{
-}
-
-GargoyleProfile::GargoyleProfile(uint32_t minIp, uint32_t maxIp, Usage usage)
+GargoyleProfile::GargoyleProfile(Usage usage)
 {
     // Set up the IP range
-    this->minIp = minIp;
-    this->maxIp = maxIp;
+    minIp = usage.minIp;
+    maxIp = usage.maxIp;
 
     // Set up the usage for the profile
     currentUsage = usage;
@@ -37,6 +33,8 @@ void GargoyleProfile::setUsage(Usage usage)
 
     usageDelta = lastUsage.current - currentUsage.current;
     timeDelta = lastUsage.time - currentUsage.time;
+
+    updated = true;
 }
 
 Usage GargoyleProfile::getUsage() const
@@ -49,12 +47,12 @@ Usage GargoyleProfile::getLastUsage() const
     return lastUsage;
 }
 
-intmax_t GargoyleProfile::getUsageDelta() const
+int64_t GargoyleProfile::getUsageDelta() const
 {
     return usageDelta;
 }
 
-intmax_t GargoyleProfile::getTimeDelta() const
+int64_t GargoyleProfile::getTimeDelta() const
 {
     return timeDelta;
 }

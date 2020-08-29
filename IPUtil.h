@@ -17,6 +17,20 @@ public:
     }
 
     /// Parses a string IP representation to an integer
+    static uint64_t parseIpRange(const QString ip)
+    {
+        return parseIpRange(QStringRef(&ip));
+    }
+
+    /// Parses a string IP representation to an integer
+    static uint64_t parseIpRange(const QStringRef ip)
+    {
+        QVector<QStringRef> range = ip.split('-');
+        uint64_t ret = createIpRange(parseIp(range[0]), parseIp(range[1]));
+        return ret;
+    }
+
+    /// Parses a string IP representation to an integer
     static uint32_t parseIp(const QStringRef ip)
     {
         uint32_t intIp = 0;
@@ -33,16 +47,26 @@ public:
         return intIp;
     }
 
+    static uint32_t rangeStart(uint64_t ipRange)
+    {
+        return ipRange & 0xFFFFFFFF;
+    }
+
+    static uint32_t rangeEnd(uint64_t ipRange)
+    {
+        return (ipRange >> 32) & 0xFFFFFFFF;
+    }
+
     /// Creates a string representation of an IP range
     static QString ipRangeToString(uint64_t ipRange)
     {
-        return ipRangeToString((ipRange >> 32) & 0xFFFFFF, ipRange & 0xFFFFFF);
+        return ipRangeToString(rangeStart(ipRange), rangeEnd(ipRange));
     }
 
     /// Creates a string representation of an IP range
     static QString ipRangeToString(uint32_t minIp, uint32_t maxIp)
     {
-        return ipToString(minIp) + " - " + ipToString(maxIp);
+        return ipToString(minIp) + "-" + ipToString(maxIp);
     }
 
     /// Creates a string representation of an IP

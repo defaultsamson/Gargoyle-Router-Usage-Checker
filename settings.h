@@ -3,14 +3,10 @@
 
 #include <QString>
 #include <QSettings>
-#include <QStandardPaths>
 
 class Settings
 {
 public:
-    static const QString DEFAULT_DIR;
-    static const QString SETTINGS_FILE;
-
     static QSettings* QSETTINGS;
 
     static Settings DISPLAY_ABOVE;

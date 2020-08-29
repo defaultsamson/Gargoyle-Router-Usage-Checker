@@ -51,7 +51,6 @@ DialogSettings::DialogSettings(MainWindow *main) :
         layout->addWidget(checkBox);
         layout->setAlignment(Qt::AlignCenter);
 
-
         QWidget *widget = new QWidget();
         widget->setContentsMargins(0, 0, 0, 0);
         widget->setLayout(layout);
@@ -110,6 +109,12 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
+    for (int i = 0; i < checkboxes.size() && i < main->profiles().size(); ++i) {
+        main->profiles().at(i)->name = ui->tableWidget->item(i, COL_NAME)->text();
+        main->profiles().at(i)->showInGraph = checkboxes.at(i)->isChecked();
+    }
+
+    main->saveProfiles();
     main->loadSettings();
 
     close();

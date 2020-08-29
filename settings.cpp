@@ -1,4 +1,5 @@
 #include "settings.h"
+#include "fileutil.h"
 
 const QVariant Settings::value() {
     return QSETTINGS->value(_key, _defaultValue);
@@ -18,10 +19,7 @@ void Settings::clearValue() {
     QSETTINGS->remove(_key);
 }
 
-const QString Settings::DEFAULT_DIR = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/Gargoyle-Usage-Checker/";
-const QString Settings::SETTINGS_FILE = "settings.ini";
-
-QSettings* Settings::QSETTINGS = new QSettings(DEFAULT_DIR + SETTINGS_FILE, QSettings::IniFormat);
+QSettings* Settings::QSETTINGS = new QSettings(FileUtil::DEFAULT_DIR + FileUtil::SETTINGS_FILE, QSettings::IniFormat);
 
 Settings Settings::DISPLAY_ABOVE = Settings("display_above_other_windows", true);
 Settings Settings::RELOAD_LOCATION = Settings("open_at_prev_location", true);

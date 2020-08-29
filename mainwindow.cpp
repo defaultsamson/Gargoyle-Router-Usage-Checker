@@ -8,13 +8,21 @@
 #include <QCloseEvent>
 #include <QShowEvent>
 #include <QScreen>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 #include "dialogsettings.h"
 #include "settings.h"
 #include "gargoyleparser.h"
 #include "gargoyleprofile.h"
+#include "fileutil.h"
+#include "IPUtil.h"
 
-#include <iostream>
+const QString MainWindow::JSON_PROFILES = "profiles";
+const QString MainWindow::JSON_IP_RANGE = "ip_range";
+const QString MainWindow::JSON_NAME = "name";
+const QString MainWindow::JSON_ACTIVE = "active";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -54,10 +62,42 @@ MainWindow::MainWindow(QWidget *parent)
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
-    loadSettings();
+    loadSettings(true);
 }
 
-void MainWindow::loadSettings() {
+void MainWindow::saveProfiles() {
+    QString fn = FileUtil::DEFAULT_DIR + FileUtil::PROFILES_FILE;
+    QFile file(fn);
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("Couldn't write to save file.");
+        // TODO inform user the file failed to save
+        return;
+    }
+
+    QJsonObject json;
+
+    // Creates an array of profiles
+    QJsonArray profiles;
+    for (int i = 0; i < _profiles.size(); ++i) {
+        QJsonObject p;
+        GargoyleProfile *profile = _profiles.at(i);
+
+        p[JSON_IP_RANGE] = profile->displayIpRange;
+        p[JSON_NAME] = profile->name;
+        p[JSON_ACTIVE] = profile->showInGraph;
+
+        profiles.append(p);
+    }
+
+    json[JSON_PROFILES] = profiles;
+
+    // Turns the object into text and saves it
+    QJsonDocument saveDoc(json);
+    file.write(saveDoc.toJson());
+}
+
+void MainWindow::loadSettings(bool initial) {
     setDarkTheme(Settings::DARK_THEME.value().toBool());
 
     Qt::WindowFlags flags = windowFlags();
@@ -68,7 +108,49 @@ void MainWindow::loadSettings() {
         flags &= ~Qt::WindowStaysOnTopHint;
 
     setWindowFlags(flags);
-    show();
+    if (!initial) show();
+
+    // Load profiles
+    if (initial) {
+        // Clear previous profiles
+        for (int i = _profiles.size() - 1; i >= 0; --i) delete _profiles.at(i);
+        _profiles.clear();
+
+        QString fn = FileUtil::DEFAULT_DIR + FileUtil::PROFILES_FILE;
+        QFile file(fn);
+
+        qDebug() << "Loading File: " << fn;
+        if (!file.open(QIODevice::ReadOnly)) {
+            qWarning("Couldn't open save file.");
+            // TODO inform user the file failed to load
+            return;
+        }
+
+        QJsonDocument loadDoc(QJsonDocument::fromJson(file.readAll()));
+        QJsonObject obj = loadDoc.object();
+        QJsonArray arr = obj[JSON_PROFILES].toArray();
+
+        for (int i = 0; i < arr.size(); ++i) {
+            QJsonObject json = arr[i].toObject();
+
+            Usage u;
+            QString ipRangeString = json[JSON_IP_RANGE].toString();
+            uint64_t range = IPUtil::parseIpRange(ipRangeString);
+            u.minIp = IPUtil::rangeStart(range);
+            u.maxIp = IPUtil::rangeEnd(range);
+            std::chrono::nanoseconds requestTime = std::chrono::system_clock::now().time_since_epoch();
+            u.time = requestTime;
+            u.current = 0;
+            u.max = 0;
+
+            GargoyleProfile *profile = new GargoyleProfile(u);
+            profile->name = json[JSON_NAME].toString();
+            profile->displayIpRange = ipRangeString;
+            profile->showInGraph = json[JSON_ACTIVE].toBool();
+
+            _profiles.append(profile);
+        }
+    }
 }
 
 void MainWindow::setDarkTheme(bool set) {

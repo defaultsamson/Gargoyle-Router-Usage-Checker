@@ -22,7 +22,8 @@ public:
     ~MainWindow();
 
     void setDarkTheme(bool set = true);
-    void loadSettings();
+    void saveProfiles();
+    void loadSettings(bool initial = false);
     const QList<GargoyleProfile*> &profiles();
 
 protected:
@@ -35,6 +36,10 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+    static const QString JSON_PROFILES;
+    static const QString JSON_IP_RANGE;
+    static const QString JSON_NAME;
+    static const QString JSON_ACTIVE;
 
     QPalette darkPalette;
     QPalette defaultPalette;

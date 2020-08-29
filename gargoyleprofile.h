@@ -26,6 +26,7 @@ public:
     /// IP range for display
     QString displayIpRange;
 
+    /// Whether this ip range is updating on the graph
     bool showInGraph = true;
 
     GargoyleProfile(Usage usage);

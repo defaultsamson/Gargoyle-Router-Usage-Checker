@@ -17,6 +17,7 @@ DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs depr
 
 SOURCES += \
     dialogsettings.cpp \
+    fileutil.cpp \
     gargoyleparser.cpp \
     gargoyleprofile.cpp \
     main.cpp \
@@ -26,6 +27,7 @@ SOURCES += \
 HEADERS += \
     IPUtil.h \
     dialogsettings.h \
+    fileutil.h \
     gargoyleparser.h \
     gargoyleprofile.h \
     mainwindow.h \

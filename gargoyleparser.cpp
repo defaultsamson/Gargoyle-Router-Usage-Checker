@@ -196,7 +196,10 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile> profiles)
         // If no profile is found, make a new one
         if (!foundProfile)
         {
-            profiles.append(GargoyleProfile(rangeUsage));
+            GargoyleProfile profile(rangeUsage);
+            profile.name = ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
+
+            profiles.append(profile);
         }
     }
 
@@ -266,4 +269,11 @@ uint64_t GargoyleParser::createIpRange(uint32_t minIp, uint32_t maxIp)
     ipRange = (ipRange << 32) | minIp;
 
     return ipRange;
+}
+
+QString GargoyleParser::ipRangeToString(uint32_t minIp, uint32_t maxIp)
+{
+    return QString::asprintf("%d.%d.%d.%d - %d.%d.%d.%d",
+                             (minIp >> 24) & 255, (minIp >> 16) & 255, (minIp >> 8) & 255, minIp & 255,
+                             (maxIp >> 24) & 255, (maxIp >> 16) & 255, (maxIp >> 8) & 255, maxIp & 255);
 }

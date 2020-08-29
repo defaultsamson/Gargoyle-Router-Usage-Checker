@@ -39,6 +39,9 @@ public:
     int64_t getUsageDelta() const;
     int64_t getTimeDelta() const;
 
+    uint32_t getMinIp() const;
+    uint32_t getMaxIp() const;
+
 private:
     /// The profile minimum and maximum IPs
     uint32_t minIp, maxIp;

@@ -56,3 +56,13 @@ int64_t GargoyleProfile::getTimeDelta() const
 {
     return timeDelta;
 }
+
+uint32_t GargoyleProfile::getMinIp() const
+{
+    return minIp;
+}
+
+uint32_t GargoyleProfile::getMaxIp() const
+{
+    return maxIp;
+}

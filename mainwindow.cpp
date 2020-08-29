@@ -1,10 +1,13 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <stdlib.h>
+
 #include <QMenu>
 #include <QMouseEvent>
 #include <QCloseEvent>
 #include <QShowEvent>
+#include <QScreen>
 
 #include "dialogsettings.h"
 #include "settings.h"
@@ -89,7 +92,51 @@ void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
-    if (evt->button() == Qt::LeftButton) dragStarted = false;
+    if (evt->button() == Qt::LeftButton) {
+        dragStarted = false;
+
+        const int thresh = Settings::SNAP_THRESHOLD.value().toInt();
+
+        // Snap to screen edge if there's a given pixel threshold
+        if (thresh > 0) {
+            // The current screen
+            QScreen* s = screen();
+            QRect g = s->availableGeometry();
+
+            // Screen geometry
+            const int sLeft = g.x();
+            const int sTop = g.y();
+            const int sRight = sLeft + g.width();
+            const int sBottom = sTop + g.height();
+
+            // Window geometry
+            const int wLeft = x();
+            const int wTop = y();
+            const int wRight = wLeft + width();
+            const int wBottom = wTop + height();
+
+            // Window destination x and y
+            int x = wLeft, y = wTop;
+
+            if (abs(wLeft - sLeft) < thresh) {
+                // Snap to left
+                x = sLeft;
+            } else if (abs(sRight - wRight) < thresh) {
+                // Snap to right
+                x = sRight - width();
+            }
+
+            if (abs(wTop - sTop) < thresh) {
+                // Snap to top
+                y = sTop;
+            } else if (abs(sBottom - wBottom) < thresh) {
+                // Snap to bottom
+                y = sBottom - height();
+            }
+
+            setGeometry(x, y, width(), height());
+        }
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

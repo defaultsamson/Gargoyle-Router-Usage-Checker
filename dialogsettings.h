@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include <QDialog>
+#include <QTableWidgetItem>
 
 namespace Ui {
 class DialogSettings;
@@ -19,6 +20,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *);
     void showEvent(QShowEvent *);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void on_buttonBox_rejected();
@@ -30,7 +32,6 @@ private slots:
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;
-    bool darkThemeOriginal;
 
     void updateGridWidth();
 };

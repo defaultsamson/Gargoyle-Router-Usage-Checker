@@ -11,6 +11,8 @@
 #include "gargoyleparser.h"
 #include "gargoyleprofile.h"
 
+#include <iostream>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -19,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     // Sets window as borderless
-    setWindowFlag(Qt::FramelessWindowHint);
+    // setWindowFlag();
     // Enables custom right click menu
     setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -49,12 +51,28 @@ MainWindow::MainWindow(QWidget *parent)
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
+    loadSettings();
+}
+
+void MainWindow::loadSettings() {
     setDarkTheme(Settings::DARK_THEME.value().toBool());
+
+    Qt::WindowFlags flags = windowFlags();
+    flags |= Qt::FramelessWindowHint;
+    if (Settings::DISPLAY_ABOVE.value().toBool())
+        flags |= Qt::WindowStaysOnTopHint;
+    else
+        flags &= ~Qt::WindowStaysOnTopHint;
+
+    setWindowFlags(flags);
+    show();
+
+    updateData();
 }
 
 void MainWindow::setDarkTheme(bool set) {
     qApp->setPalette(set ? darkPalette : defaultPalette);
-    Settings::DARK_THEME.setValue(set);
+    // Settings::DARK_THEME.setValue(set);
 }
 
 /// Records the initial oldRelativePos upon dragging
@@ -105,13 +123,16 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::updateData() {
-    parser.update(Settings::ROUTER_IP.value().toString(), profiles);
-
+    parser.update(Settings::ROUTER_IP.value().toString(), _profiles);
 }
 
 void MainWindow::openOptions() {
     DialogSettings s(this);
     s.exec();
+}
+
+const QList<GargoyleProfile*> &MainWindow::profiles() {
+    return _profiles;
 }
 
 MainWindow::~MainWindow()

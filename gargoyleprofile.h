@@ -23,6 +23,11 @@ public:
     /// Profile name for display
     QString name;
 
+    /// IP range for display
+    QString displayIpRange;
+
+    bool showInGraph = true;
+
     GargoyleProfile(Usage usage);
 
     bool operator==(GargoyleProfile profile) const noexcept;

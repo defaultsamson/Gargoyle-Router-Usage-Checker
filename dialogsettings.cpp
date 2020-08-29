@@ -5,18 +5,17 @@
 #include "settings.h"
 
 #include <QHeaderView>
+#include <QTableWidgetItem>
 
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
-    main(main),
-    ui(new Ui::DialogSettings)
+    ui(new Ui::DialogSettings),
+    main(main)
 {
     ui->setupUi(this);
 
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Fixed);
-
-    darkThemeOriginal = Settings::DARK_THEME.value().toBool();
 
     ui->checkBoxOtherWindows->setChecked(Settings::DISPLAY_ABOVE.value().toBool());
     ui->checkBoxSaveGeometry->setChecked(Settings::RELOAD_LOCATION.value().toBool());
@@ -27,13 +26,39 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->spinBoxSeconds->setValue(Settings::UPDATE_SECONDS.value().toInt());
     ui->spinBoxSeconds->setRange(1, 60 * 10);
     ui->lineEditIP->setText(Settings::ROUTER_IP.value().toString());
+
+    // Test data
+    QTableWidget *t = ui->tableWidget;
+
+    for (int i = 0; i < main->profiles().size(); ++i) {
+        GargoyleProfile *profile = main->profiles().at(i);
+
+        t->insertRow(i);
+        QCheckBox *checkBox = new QCheckBox();
+        checkBox->setChecked(profile->showInGraph);
+
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget(checkBox);
+
+        QWidget *widget = new QWidget();
+        widget->setContentsMargins(0, 0, 0, 0);
+        widget->setLayout(layout);
+
+        t->setCellWidget(i, 0, checkBox);
+        t->setCellWidget(i, 1, new QLabel(profile->displayIpRange));
+        t->setItem(i, 2, new QTableWidgetItem(profile->name));
+        t->item(i, 2)->setTextAlignment(Qt::AlignCenter);
+    }
 }
 
 /// Manually updates the width of the columns in the grid, because resizing the columns is broken
 void DialogSettings::updateGridWidth() {
-    int maxSize = ui->tableWidget->width();
-    ui->tableWidget->horizontalHeader()->resizeSection(0, maxSize/2);
-    ui->tableWidget->horizontalHeader()->resizeSection(1, maxSize/2);
+    const int BUTTON_COLUMN = 20;
+    int remainingWidth = ui->tableWidget->width() - BUTTON_COLUMN;
+    ui->tableWidget->horizontalHeader()->resizeSection(0, BUTTON_COLUMN);
+    ui->tableWidget->horizontalHeader()->resizeSection(1, remainingWidth * 0.6); // Set IP Range to 60% of the remaining area
+    // Just set this size to 1, because the table is set to automatically fill out the final column
+    ui->tableWidget->horizontalHeader()->resizeSection(2, 1);
 }
 
 void DialogSettings::resizeEvent(QResizeEvent *) {
@@ -51,8 +76,12 @@ DialogSettings::~DialogSettings()
 
 void DialogSettings::on_buttonBox_rejected()
 {
-    main->setDarkTheme(darkThemeOriginal);
+    main->loadSettings();
     close();
+}
+
+void DialogSettings::closeEvent(QCloseEvent *event) {
+    main->loadSettings();
 }
 
 void DialogSettings::on_buttonBox_accepted()
@@ -66,10 +95,13 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
+    main->loadSettings();
+
     close();
 }
 
 void DialogSettings::on_checkBoxDarkTheme_stateChanged(int state)
 {
+    // Temporarily change dark theme
     main->setDarkTheme(state == Qt::CheckState::Checked);
 }

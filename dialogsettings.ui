@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>400</height>
+    <width>420</width>
+    <height>500</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -24,8 +24,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>380</width>
-        <height>349</height>
+        <width>400</width>
+        <height>449</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -110,7 +110,7 @@
          <item>
           <widget class="QLineEdit" name="lineEditIP">
            <property name="placeholderText">
-            <string>e.g. 192.168.0.1</string>
+            <string>e.g. http://192.168.0.1</string>
            </property>
           </widget>
          </item>
@@ -127,6 +127,14 @@
          <attribute name="horizontalHeaderStretchLastSection">
           <bool>true</bool>
          </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string/>
+          </property>
+         </column>
          <column>
           <property name="text">
            <string>IP Range</string>

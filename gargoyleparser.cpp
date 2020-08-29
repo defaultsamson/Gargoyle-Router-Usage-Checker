@@ -15,6 +15,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
 {
     // Set up network manager
     QNetworkAccessManager manager;
+
     manager.setTransferTimeout(timeout);
 
     // Set up request and reply
@@ -196,7 +197,9 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
         if (!foundProfile)
         {
             GargoyleProfile* profile = new GargoyleProfile(rangeUsage);
-            profile->name = ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
+            QString ipRange = ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
+            profile->name = ipRange; // TODO try and load from settings
+            profile->displayIpRange = ipRange;
 
             profiles.append(profile);
         }

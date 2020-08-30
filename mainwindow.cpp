@@ -259,7 +259,7 @@ void MainWindow::openOptions() {
     s.exec();
 }
 
-const QList<GargoyleProfile*> &MainWindow::profiles() {
+QList<GargoyleProfile*> &MainWindow::profiles() {
     return _profiles;
 }
 

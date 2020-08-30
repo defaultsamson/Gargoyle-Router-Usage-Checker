@@ -5,10 +5,42 @@
 #include <QDialog>
 #include <QTableWidgetItem>
 #include <QCheckBox>
+#include <QPushButton>
 
 namespace Ui {
 class DialogSettings;
 }
+
+class DeletePushButton : public QPushButton
+{
+    Q_OBJECT
+
+    int _profileIndex;
+public:
+    DeletePushButton(int profileIndex) : _profileIndex(profileIndex) {
+        setText("");
+        setIcon(QIcon(":/icons/res/delete.png"));
+        setIconSize(QSize(24, 24));
+        connect(this, &DeletePushButton::clicked, this, [&]{ emit deleteEntry(_profileIndex); });
+    }
+
+signals:
+    void deleteEntry(int index);
+};
+
+class ProfileCheckBox : public QCheckBox
+{
+    Q_OBJECT
+
+    int _profileIndex;
+public:
+    ProfileCheckBox(int profileIndex) : _profileIndex(profileIndex) {
+        connect(this, &ProfileCheckBox::stateChanged, this, [&](int state){ emit checkEntry(_profileIndex, state == Qt::Checked); });
+    }
+
+signals:
+    void checkEntry(int index, bool checked);
+};
 
 class DialogSettings : public QDialog
 {
@@ -37,7 +69,6 @@ private slots:
 private:
     Ui::DialogSettings *ui;
     MainWindow *main;
-    QList <QCheckBox*> checkboxes;
     bool accepted = false;
 
     /// The index of the column containing checkboxes
@@ -48,6 +79,9 @@ private:
     const int COL_NAME = 2;
     bool originalDarkTheme;
 
+    QList<int> deletedIndexes;
+    QList<int> checkedIndexes;
+    void refreshTable(bool firstTime = false);
     void updateGridWidth();
 };
 

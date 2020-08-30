@@ -24,7 +24,7 @@ public:
     void setDarkTheme(bool set = true);
     void saveProfiles();
     void loadSettings(bool initial = false);
-    const QList<GargoyleProfile*> &profiles();
+    QList<GargoyleProfile*> &profiles();
 
 protected:
     void mousePressEvent(QMouseEvent *evt);

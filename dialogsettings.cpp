@@ -7,6 +7,8 @@
 #include <QHeaderView>
 #include <QTableWidgetItem>
 #include <algorithm>
+#include <QPushButton>
+#include <iostream>
 
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
@@ -35,30 +37,75 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->spinBoxSeconds->setRange(1, 60 * 60); // From 1 second to 1 hour between updates
     ui->lineEditIP->setText(Settings::ROUTER_IP.value().toString());
 
-    // Test data
+    refreshTable(true);
+}
+
+void DialogSettings::refreshTable(bool firstTime) {
     QTableWidget *t = ui->tableWidget;
+    // Clear the table
+    for (int i = t->rowCount() - 1; i >= 0; i--) t->removeRow(i);
 
-    QList<uint64_t> rangeKeys = main->profiles().keys();
-    for (int i = 0; i < rangeKeys.size(); ++i) {
-        GargoyleProfile *profile = main->profiles()[rangeKeys[i]];
+    //QList<uint64_t> rangeKeys = main->profiles().keys();
+    //for (int i = 0; i < rangeKeys.size(); ++i) {
+    //    GargoyleProfile *profile = main->profiles()[rangeKeys[i]];
+    int tableI = 0;
+    for (int i = 0; i < main->profiles().size(); ++i) {
 
-        t->insertRow(i);
-        QCheckBox *checkBox = new QCheckBox();
-        checkBox->setChecked(profile->showInGraph);
-        checkboxes.append(checkBox);
+        // If the profile index has been queued for deletion, skip it and maintain the tableI
+        if (deletedIndexes.contains(i)) continue;
+
+        GargoyleProfile *profile = main->profiles().at(i);
+
+        t->insertRow(tableI);
+        ProfileCheckBox *checkBox = new ProfileCheckBox(i);
+        checkBox->setChecked(firstTime ? profile->showInGraph : checkedIndexes.contains(i));
+        // If it's being initialized, add the checkedIndex the first time
+        if (firstTime && profile->showInGraph) checkedIndexes.append(i);
 
         QHBoxLayout *layout = new QHBoxLayout();
         layout->setContentsMargins(0, 0, 0, 0);
-        layout->addWidget(checkBox);
         layout->setAlignment(Qt::AlignCenter);
 
         QWidget *widget = new QWidget();
         widget->setContentsMargins(0, 0, 0, 0);
         widget->setLayout(layout);
 
-        t->setCellWidget(i, COL_CHECKBOX, widget);
-        t->setCellWidget(i, COL_IP_RANGE, new QLabel(profile->displayIpRange));
-        t->setItem(i, COL_NAME, new QTableWidgetItem(profile->name));
+        QObject::connect(checkBox, &ProfileCheckBox::checkEntry, this, [&](int index, bool checked){
+            if (checked)
+                this->checkedIndexes.append(index);
+            else
+                this->checkedIndexes.removeAll(index);
+        });
+
+        QLabel *label = new QLabel(profile->displayIpRange);
+
+        QHBoxLayout *layout2 = new QHBoxLayout();
+        layout2->setContentsMargins(0, 0, 0, 0);
+        layout2->setAlignment(Qt::AlignCenter);
+        layout2->addWidget(label);
+
+        QWidget *widget2 = new QWidget();
+        widget2->setContentsMargins(0, 0, 0, 0);
+        widget2->setLayout(layout2);
+
+
+        if (profile->updated) {
+            layout->addWidget(checkBox);
+        } else {
+            DeletePushButton *but = new DeletePushButton(i);
+            layout->addWidget(but);
+
+            QObject::connect(but, &DeletePushButton::deleteEntry, this, [&](int index){
+                this->deletedIndexes.append(index);
+                this->refreshTable();
+            });
+        }
+
+        t->setCellWidget(tableI, COL_CHECKBOX, widget);
+        t->setCellWidget(tableI, COL_IP_RANGE, widget2);
+        t->setItem(tableI, COL_NAME, new QTableWidgetItem(profile->name));
+
+        tableI++;
     }
 }
 
@@ -110,10 +157,16 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
-    QList<uint64_t> rangeKeys = main->profiles().keys();
-    for (int i = 0; i < checkboxes.size() && i < rangeKeys.size(); ++i) {
-        main->profiles()[rangeKeys[i]]->name = ui->tableWidget->item(i, COL_NAME)->text();
-        main->profiles()[rangeKeys[i]]->showInGraph = checkboxes.at(i)->isChecked();
+    //QList<uint64_t> rangeKeys = main->profiles().keys();
+    //for (int i = 0; i < checkboxes.size() && i < rangeKeys.size(); ++i) {
+    //    main->profiles()[rangeKeys[i]]->name = ui->tableWidget->item(i, COL_NAME)->text();
+    //    main->profiles()[rangeKeys[i]]->showInGraph = checkboxes.at(i)->isChecked();
+    // Set all as false
+    for (int i = 0; i < main->profiles().size(); ++i) main->profiles().at(i)->showInGraph = false;
+    // Then, set true based on the checked indexes
+    for (int i = 0; i < checkedIndexes.size(); ++i) {
+        int index = checkedIndexes.at(i);
+        main->profiles().at(index)->showInGraph = true;
     }
 
     main->saveProfiles();

@@ -201,8 +201,10 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
         if (!foundProfile)
         {
             GargoyleProfile* profile = new GargoyleProfile(rangeUsage);
+            profile->updated = true;
+
             QString ipRange = IPUtil::ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
-            profile->name = ipRange; // TODO try and load from settings
+            profile->name = ipRange;
             profile->displayIpRange = ipRange;
 
             profiles.append(profile);

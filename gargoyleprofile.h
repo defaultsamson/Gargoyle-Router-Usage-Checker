@@ -6,7 +6,6 @@
 
 struct Usage
 {
-    uint32_t minIp, maxIp;
     std::chrono::nanoseconds time;
     uint64_t current, max;
 };
@@ -14,9 +13,6 @@ struct Usage
 class GargoyleProfile
 {
 public:
-    /// Whether this profile was updated last time it was fetched
-    bool updated = false;
-
     /// Whether this profile is the current device's profile
     bool deviceProfile = false;
 
@@ -26,15 +22,24 @@ public:
     /// IP range for display
     QString displayIpRange;
 
-    /// Whether this ip range is updating on the graph
+    /// Whether this IP range is updating on the graph
     bool showInGraph = true;
 
-    GargoyleProfile(Usage usage);
+    GargoyleProfile(uint32_t ip);
+    GargoyleProfile(uint64_t ipRange);
+    GargoyleProfile(uint32_t minIp, uint32_t maxIp);
 
-    bool operator==(GargoyleProfile profile) const noexcept;
+    bool operator==(const GargoyleProfile &profile) const noexcept;
+    bool operator==(uint64_t ipRange) const noexcept;
     bool equals(uint32_t minIp, uint32_t maxIp) const;
 
     bool containsIp(uint32_t ip) const;
+
+    uint32_t getMinIp() const;
+    uint32_t getMaxIp() const;
+
+    bool isUpdated() const;
+    void setNotUpdated();
 
     /// Sets the new usage and calculates the usage speed
     void setUsage(Usage usage);
@@ -47,17 +52,22 @@ public:
     int64_t getUsageDelta() const;
     std::chrono::nanoseconds getTimeDelta() const;
 
-    uint32_t getMinIp() const;
-    uint32_t getMaxIp() const;
+    int64_t getUsagePerSecond() const;
 
 private:
     /// The profile minimum and maximum IPs
     uint32_t minIp, maxIp;
 
+    /// Whether this profile was updated last time it was fetched
+    bool updated = false;
+
+    bool hasCurrentUsage = false;
     Usage currentUsage, lastUsage;
 
     int64_t usageDelta;
     std::chrono::nanoseconds timeDelta;
+
+    int64_t usagePerSecond;
 };
 
 #endif // GARGOYLEPROFILE_H

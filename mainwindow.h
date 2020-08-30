@@ -24,7 +24,7 @@ public:
     void setDarkTheme(bool set = true);
     void saveProfiles();
     void loadSettings(bool initial = false);
-    QList<GargoyleProfile*> &profiles();
+    QMap<uint64_t, GargoyleProfile*> &profiles();
 
 protected:
     void mousePressEvent(QMouseEvent *evt);
@@ -49,7 +49,7 @@ private:
     bool dragStarted = false;
 
     GargoyleParser parser;
-    QList<GargoyleProfile*> _profiles;
+    QMap<uint64_t, GargoyleProfile*> _profiles;
 
 private slots:
     void showContextMenu(const QPoint &pos);

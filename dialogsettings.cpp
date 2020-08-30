@@ -45,6 +45,9 @@ void DialogSettings::refreshTable(bool firstTime) {
     // Clear the table
     for (int i = t->rowCount() - 1; i >= 0; i--) t->removeRow(i);
 
+    //QList<uint64_t> rangeKeys = main->profiles().keys();
+    //for (int i = 0; i < rangeKeys.size(); ++i) {
+    //    GargoyleProfile *profile = main->profiles()[rangeKeys[i]];
     int tableI = 0;
     for (int i = 0; i < main->profiles().size(); ++i) {
 
@@ -154,6 +157,10 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
+    //QList<uint64_t> rangeKeys = main->profiles().keys();
+    //for (int i = 0; i < checkboxes.size() && i < rangeKeys.size(); ++i) {
+    //    main->profiles()[rangeKeys[i]]->name = ui->tableWidget->item(i, COL_NAME)->text();
+    //    main->profiles()[rangeKeys[i]]->showInGraph = checkboxes.at(i)->isChecked();
     // Set all as false
     for (int i = 0; i < main->profiles().size(); ++i) main->profiles().at(i)->showInGraph = false;
     // Then, set true based on the checked indexes

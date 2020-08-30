@@ -66,10 +66,10 @@ void DialogSettings::updateGridWidth() {
     const int BUTTON_COLUMN = 20;
     const double RANGE_MAX_SIZE = 230;
     int remainingWidth = ui->tableWidget->width() - BUTTON_COLUMN;
-    ui->tableWidget->horizontalHeader()->resizeSection(0, BUTTON_COLUMN);
-    ui->tableWidget->horizontalHeader()->resizeSection(1, std::min(remainingWidth * 0.6, RANGE_MAX_SIZE)); // Set IP Range to 60% of the remaining area
+    ui->tableWidget->horizontalHeader()->resizeSection(COL_CHECKBOX, BUTTON_COLUMN);
+    ui->tableWidget->horizontalHeader()->resizeSection(COL_IP_RANGE, std::min(remainingWidth * 0.6, RANGE_MAX_SIZE)); // Set IP Range to 60% of the remaining area
     // Just set this size to 1, because the table is set to automatically fill out the final column
-    ui->tableWidget->horizontalHeader()->resizeSection(2, 1);
+    ui->tableWidget->horizontalHeader()->resizeSection(COL_NAME, 1);
 }
 
 void DialogSettings::resizeEvent(QResizeEvent *) {

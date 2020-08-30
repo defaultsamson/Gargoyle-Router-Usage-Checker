@@ -144,6 +144,7 @@ void MainWindow::loadSettings(bool initial) {
             u.max = 0;
 
             GargoyleProfile *profile = new GargoyleProfile(u);
+            profile->updated = false;
             profile->name = json[JSON_NAME].toString();
             profile->displayIpRange = ipRangeString;
             profile->showInGraph = json[JSON_ACTIVE].toBool();

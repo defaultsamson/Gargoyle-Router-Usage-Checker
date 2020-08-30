@@ -15,7 +15,7 @@ class GargoyleProfile
 {
 public:
     /// Whether this profile was updated last time it was fetched
-    bool updated = true;
+    bool updated = false;
 
     /// Whether this profile is the current device's profile
     bool deviceProfile = false;

@@ -65,6 +65,10 @@ void GargoyleProfile::setUsage(Usage usage)
     usageDelta = currentUsage.current - lastUsage.current;
     timeDelta = currentUsage.time - lastUsage.time;
 
+    int64_t timeDeltaCount = timeDelta.count();
+    // Multiply by the unit before dividing by the delta to reduce rounding errors
+    usagePerSecond = timeDeltaCount != 0 ? (usageDelta * std::nano().den) / timeDeltaCount : 0;
+
     updated = true;
 }
 
@@ -90,4 +94,10 @@ std::chrono::nanoseconds GargoyleProfile::getTimeDelta() const
 {
     assert(updated);
     return timeDelta;
+}
+
+int64_t GargoyleProfile::getUsagePerSecond() const
+{
+    assert(updated);
+    return usagePerSecond;
 }

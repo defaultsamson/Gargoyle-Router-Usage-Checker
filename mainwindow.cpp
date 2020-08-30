@@ -249,7 +249,7 @@ void MainWindow::updateData() {
             if (profile->isUpdated())
             {
                 Usage usage = profile->getUsage();
-                qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count());
+                qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns (%lld bytes/s)", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count(), profile->getUsagePerSecond());
             }
             else
             {

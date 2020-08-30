@@ -52,6 +52,8 @@ public:
     int64_t getUsageDelta() const;
     std::chrono::nanoseconds getTimeDelta() const;
 
+    int64_t getUsagePerSecond() const;
+
 private:
     /// The profile minimum and maximum IPs
     uint32_t minIp, maxIp;
@@ -64,6 +66,8 @@ private:
 
     int64_t usageDelta;
     std::chrono::nanoseconds timeDelta;
+
+    int64_t usagePerSecond;
 };
 
 #endif // GARGOYLEPROFILE_H

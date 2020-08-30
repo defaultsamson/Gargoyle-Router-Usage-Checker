@@ -13,7 +13,7 @@ GargoyleParser::GargoyleParser()
 
 }
 
-bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
+bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profiles)
 {
     // Set up network manager
     QNetworkAccessManager manager;
@@ -37,9 +37,9 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
     }
 
     // Set all profiles to not updated and not the current device
-    for (GargoyleProfile* profile : profiles)
+    for (GargoyleProfile *profile : profiles)
     {
-        profile->updated = false;
+        profile->setNotUpdated();
         profile->deviceProfile = false;
     }
 
@@ -72,8 +72,6 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
             int end = line.lastIndexOf('"');
 
             currentIp = IPUtil::parseIp(line.midRef(start, end - start));
-
-            //qDebug("Your IP: %d.%d.%d.%d", (currentIp >> 24) & 255, (currentIp >> 16) & 255, (currentIp >> 8) & 255, currentIp & 255);
             break;
         }
 
@@ -143,7 +141,7 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
                     // Create new usage
                     else
                     {
-                        Usage rangeUsage{minIp, maxIp, requestTime, 0, 0};
+                        Usage rangeUsage{requestTime, 0, 0};
 
                         switch (lineType)
                         {
@@ -165,13 +163,6 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
 
                         rangeUsages[rangeKey] = rangeUsage;
                     }
-
-                    /*
-                    if (isLimit)
-                        qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with limit" << data;
-                    else if (isUsed)
-                        qDebug() << "Range" << qUtf8Printable(sections[1].toString()) << "with usage" << data;
-                    */
                 }
             }
             break;
@@ -183,36 +174,28 @@ bool GargoyleParser::update(QString url, QList<GargoyleProfile*> &profiles)
     }
 
     // Add usages to profiles, creating profiles as needed
-    for (Usage rangeUsage : rangeUsages)
+    for (uint64_t rangeKey : rangeUsages.keys())
     {
-        bool foundProfile = false;
-        for (GargoyleProfile* profile : profiles)
+        if (profiles.contains(rangeKey))
         {
-            // If this range has a profile, set the usage
-            if (profile->equals(rangeUsage.minIp, rangeUsage.maxIp))
-            {
-                foundProfile = true;
-                profile->setUsage(rangeUsage);
-                break;
-            }
+            profiles[rangeKey]->setUsage(rangeUsages[rangeKey]);
         }
-
-        // If no profile is found, make a new one
-        if (!foundProfile)
+        else
         {
-            GargoyleProfile* profile = new GargoyleProfile(rangeUsage);
-            profile->updated = true;
+            GargoyleProfile *profile = new GargoyleProfile(rangeKey);
 
-            QString ipRange = IPUtil::ipRangeToString(rangeUsage.minIp, rangeUsage.maxIp);
+            QString ipRange = IPUtil::ipRangeToString(rangeKey);
             profile->name = ipRange;
             profile->displayIpRange = ipRange;
 
-            profiles.append(profile);
+            profile->setUsage(rangeUsages[rangeKey]);
+
+            profiles[rangeKey] = profile;
         }
     }
 
     // Set the device profile
-    for (GargoyleProfile* profile : profiles)
+    for (GargoyleProfile *profile : profiles)
     {
         if (profile->containsIp(currentIp))
             profile->deviceProfile = true;

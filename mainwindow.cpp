@@ -79,9 +79,8 @@ void MainWindow::saveProfiles() {
 
     // Creates an array of profiles
     QJsonArray profiles;
-    for (int i = 0; i < _profiles.size(); ++i) {
+    for (GargoyleProfile *profile : _profiles) {
         QJsonObject p;
-        GargoyleProfile *profile = _profiles.at(i);
 
         p[JSON_IP_RANGE] = profile->displayIpRange;
         p[JSON_NAME] = profile->name;
@@ -113,7 +112,7 @@ void MainWindow::loadSettings(bool initial) {
     // Load profiles
     if (initial) {
         // Clear previous profiles
-        for (int i = _profiles.size() - 1; i >= 0; --i) delete _profiles.at(i);
+        for (GargoyleProfile *profile : _profiles) delete profile;
         _profiles.clear();
 
         QString fn = FileUtil::DEFAULT_DIR + FileUtil::PROFILES_FILE;
@@ -133,23 +132,15 @@ void MainWindow::loadSettings(bool initial) {
         for (int i = 0; i < arr.size(); ++i) {
             QJsonObject json = arr[i].toObject();
 
-            Usage u;
             QString ipRangeString = json[JSON_IP_RANGE].toString();
             uint64_t range = IPUtil::parseIpRange(ipRangeString);
-            u.minIp = IPUtil::rangeStart(range);
-            u.maxIp = IPUtil::rangeEnd(range);
-            std::chrono::nanoseconds requestTime = std::chrono::system_clock::now().time_since_epoch();
-            u.time = requestTime;
-            u.current = 0;
-            u.max = 0;
 
-            GargoyleProfile *profile = new GargoyleProfile(u);
-            profile->updated = false;
+            GargoyleProfile *profile = new GargoyleProfile(range);
             profile->name = json[JSON_NAME].toString();
             profile->displayIpRange = ipRangeString;
             profile->showInGraph = json[JSON_ACTIVE].toBool();
 
-            _profiles.append(profile);
+            _profiles[range] = profile;
         }
     }
 }
@@ -251,7 +242,21 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::updateData() {
-    parser.update(Settings::ROUTER_IP.value().toString(), _profiles);
+    if (parser.update(Settings::ROUTER_IP.value().toString(), _profiles))
+    {
+        for (GargoyleProfile *profile : _profiles)
+        {
+            if (profile->isUpdated())
+            {
+                Usage usage = profile->getUsage();
+                qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count());
+            }
+            else
+            {
+                qDebug("Range \"%s\": Not updated", qUtf8Printable(profile->name));
+            }
+        }
+    }
 }
 
 void MainWindow::openOptions() {
@@ -259,7 +264,7 @@ void MainWindow::openOptions() {
     s.exec();
 }
 
-const QList<GargoyleProfile*> &MainWindow::profiles() {
+const QMap<uint64_t, GargoyleProfile*> &MainWindow::profiles() {
     return _profiles;
 }
 

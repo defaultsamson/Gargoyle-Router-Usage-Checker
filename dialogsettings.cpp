@@ -46,6 +46,7 @@ void DialogSettings::refreshTable(bool firstTime) {
     for (int i = t->rowCount() - 1; i >= 0; i--) t->removeRow(i);
 
     int tableI = 0;
+    main->profileLock.lockForRead();
     QList<uint64_t> rangeKeys = main->profiles().keys();
     for (int i = 0; i < rangeKeys.size(); ++i) {
         uint64_t range = rangeKeys[i];
@@ -128,6 +129,7 @@ void DialogSettings::refreshTable(bool firstTime) {
 
         tableI++;
     }
+    main->profileLock.unlock();
 }
 
 /// Manually updates the width of the columns in the grid, because resizing the columns is broken

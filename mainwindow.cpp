@@ -272,7 +272,10 @@ MainWindow::~MainWindow()
 
     delete Settings::QSETTINGS;
 
+    // Properly close thread before deletion
     updateThread->quit();
+    updateThread->wait();
+
     delete updateThread;
     delete updateThreadWorker;
 }

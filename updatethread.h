@@ -27,5 +27,8 @@ public slots:
     void startUpdateLoop();
     void runUpdateLoop();
     void stopUpdateLoop();
+
+signals:
+    void afterUpdate();
 };
 #endif // UPDATETHREAD_H

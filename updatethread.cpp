@@ -29,7 +29,7 @@ void UpdateThread::runUpdateLoop()
     {
         qDebug("Successfully updated usages");
 
-        // Update functions
+        // Print profiles to console
         for (GargoyleProfile *profile : mainWindow->profiles())
         {
             if (profile->isUpdated())
@@ -42,6 +42,9 @@ void UpdateThread::runUpdateLoop()
                 qDebug("Range \"%s\": Not updated", qUtf8Printable(profile->name));
             }
         }
+
+        // Update functions
+        emit afterUpdate();
     }
     else
     {

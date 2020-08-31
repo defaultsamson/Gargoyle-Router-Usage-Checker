@@ -82,13 +82,16 @@ MainWindow::MainWindow(QWidget *parent)
             if (profile->deviceProfile && profile->isUpdated())
             {
                 Usage usage = profile->getUsage();
-                ui->progressBar->setValue((usage.current * 100) / usage.max);
+                int32_t usagePercent = (usage.current * 100) / usage.max;
+
+                // Clamp the percentage to reasonable values
+                ui->progressBar->setValue(std::max(0, std::min(100, usagePercent)));
                 return;
             }
         }
 
         // If no profile is found
-        ui->progressBar->setValue(0);
+        ui->progressBar->reset();
     });
 }
 

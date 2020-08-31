@@ -30,5 +30,6 @@ public slots:
 
 signals:
     void afterUpdate();
+    void updateError();
 };
 #endif // UPDATETHREAD_H

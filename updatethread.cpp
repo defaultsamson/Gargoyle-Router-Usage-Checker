@@ -43,12 +43,13 @@ void UpdateThread::runUpdateLoop()
             }
         }
 
-        // Update functions
         emit afterUpdate();
     }
     else
     {
         qDebug("Failed to update usages");
+
+        emit updateError();
     }
 
     if (loopActive)

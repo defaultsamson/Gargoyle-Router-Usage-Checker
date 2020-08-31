@@ -24,6 +24,7 @@ public:
     void setDarkTheme(bool set = true);
     void saveProfiles();
     void loadSettings(bool initial = false);
+
     QMap<uint64_t, GargoyleProfile*> &profiles();
 
 protected:

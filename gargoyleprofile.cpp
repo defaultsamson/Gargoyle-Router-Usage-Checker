@@ -1,5 +1,5 @@
 #include "gargoyleprofile.h"
-#include "IPUtil.h"
+#include "iputil.h"
 
 GargoyleProfile::GargoyleProfile(uint32_t ip) : GargoyleProfile(ip, ip)
 {

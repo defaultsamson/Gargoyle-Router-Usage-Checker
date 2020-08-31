@@ -4,6 +4,8 @@
 #include "gargoyleparser.h"
 #include "gargoyleprofile.h"
 #include "updatethread.h"
+#include "usagegraph.h"
+#include "usagebar.h"
 
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -29,9 +31,13 @@ public:
 
     QMap<uint64_t, GargoyleProfile*> &profiles();
 
+    void mousePress(QMouseEvent *event);
+    void mouseMove(QMouseEvent *event);
+    void mouseRelease(QMouseEvent *event);
+
 protected:
-    void mousePressEvent(QMouseEvent *evt);
-    void mouseMoveEvent(QMouseEvent *evt);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
 
     void closeEvent(QCloseEvent *event);
@@ -39,6 +45,9 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+    UsageGraph *graph;
+    UsageBar *usageBar;
+
     static const QString JSON_PROFILES;
     static const QString JSON_IP_RANGE;
     static const QString JSON_NAME;
@@ -48,7 +57,7 @@ private:
     QPalette defaultPalette;
 
     /// Used for keeping track of dragging the window
-    QPoint oldRelativePos;
+    QPointF oldRelativePos;
     bool dragStarted = false;
 
     GargoyleParser parser;

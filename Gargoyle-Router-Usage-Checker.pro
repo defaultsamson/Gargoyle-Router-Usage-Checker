@@ -23,17 +23,19 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settings.cpp \
+    usagebar.cpp \
     usagegraph.cpp \
     updatethread.cpp
 
 HEADERS += \
-    IPUtil.h \
     dialogsettings.h \
     fileutil.h \
     gargoyleparser.h \
     gargoyleprofile.h \
+    iputil.h \
     mainwindow.h \
     settings.h \
+    usagebar.h \
     usagegraph.h \
     updatethread.h
 

@@ -6,7 +6,7 @@
 #include <QNetworkReply>
 #include <QEventLoop>
 
-#include "IPUtil.h"
+#include "iputil.h"
 
 GargoyleParser::GargoyleParser()
 {

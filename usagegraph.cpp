@@ -1,8 +1,10 @@
 #include "usagegraph.h"
 
+#include "mainwindow.h"
+
 #include <QChartView>
 
-UsageGraph::UsageGraph(QWidget *)
+UsageGraph::UsageGraph(MainWindow *main) : main(main)
 {
     QChart *chart = new QChart();
     chart->legend()->hide();
@@ -32,4 +34,14 @@ UsageGraph::UsageGraph(QWidget *)
     this->setContentsMargins(0, 0, 0, 0);
 
     this->setChart(chart);
+}
+
+void UsageGraph::mousePressEvent(QMouseEvent *event) {
+    main->mousePress(event);
+}
+void UsageGraph::mouseMoveEvent(QMouseEvent *event) {
+    main->mouseMove(event);
+}
+void UsageGraph::mouseReleaseEvent(QMouseEvent *event) {
+    main->mouseRelease(event);
 }

@@ -18,7 +18,7 @@
 #include "gargoyleparser.h"
 #include "gargoyleprofile.h"
 #include "fileutil.h"
-#include "IPUtil.h"
+#include "iputil.h"
 #include "updatethread.h"
 
 const QString MainWindow::JSON_PROFILES = "profiles";
@@ -64,6 +64,22 @@ MainWindow::MainWindow(QWidget *parent)
     darkPalette.setColor(QPalette::HighlightedText, Qt::white);
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
+    graph = new UsageGraph(this);
+    ui->centralwidget->layout()->addWidget(graph);
+
+    usageBar = new UsageBar();
+
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setContentsMargins(6, 0, 6, 6);
+    layout->setAlignment(Qt::AlignCenter);
+    layout->addWidget(usageBar);
+
+    QWidget *widget = new QWidget();
+    widget->setContentsMargins(0, 0, 0, 0);
+    widget->setLayout(layout);
+
+    ui->centralwidget->layout()->addWidget(widget);
+
     loadSettings(true);
 
     updateThread = new QThread();
@@ -85,13 +101,13 @@ MainWindow::MainWindow(QWidget *parent)
                 int32_t usagePercent = (usage.current * 100) / usage.max;
 
                 // Clamp the percentage to reasonable values
-                ui->progressBar->setValue(std::max(0, std::min(100, usagePercent)));
+                usageBar->setValue(std::max(0, std::min(100, usagePercent)));
                 return;
             }
         }
 
         // If no profile is found
-        ui->progressBar->reset();
+        usageBar->reset();
     });
 }
 
@@ -183,19 +199,19 @@ void MainWindow::setDarkTheme(bool set) {
 }
 
 /// Records the initial oldRelativePos upon dragging
-void MainWindow::mousePressEvent(QMouseEvent *evt) {
+void MainWindow::mousePress(QMouseEvent *evt) {
     if (evt->button() == Qt::LeftButton) {
-        oldRelativePos = evt->pos();
+        oldRelativePos = evt->windowPos();
         dragStarted = true;
     }
 }
 
 /// Moves the window to the mouse pos subtracted by the oldRelativePos
-void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
+void MainWindow::mouseMove(QMouseEvent *evt) {
     if (dragStarted) move(evt->globalPos().x() - oldRelativePos.x(), evt->globalPos().y() - oldRelativePos.y());
 }
 
-void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
+void MainWindow::mouseRelease(QMouseEvent *evt) {
     if (evt->button() == Qt::LeftButton) {
         dragStarted = false;
 
@@ -241,6 +257,18 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
             setGeometry(x, y, width(), height());
         }
     }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *evt) {
+    mousePress(evt);
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *evt) {
+    mouseMove(evt);
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *evt) {
+    mouseRelease(evt);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

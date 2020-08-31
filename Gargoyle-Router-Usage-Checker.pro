@@ -34,6 +34,7 @@ HEADERS += \
     gargoyleprofile.h \
     iputil.h \
     mainwindow.h \
+    mathhelper.h \
     settings.h \
     usagebar.h \
     usagegraph.h \

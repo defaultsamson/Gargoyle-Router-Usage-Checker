@@ -20,6 +20,7 @@
 #include "fileutil.h"
 #include "iputil.h"
 #include "updatethread.h"
+#include "mathhelper.h"
 
 const QString MainWindow::JSON_PROFILES = "profiles";
 const QString MainWindow::JSON_IP_RANGE = "ip_range";
@@ -92,16 +93,37 @@ MainWindow::MainWindow(QWidget *parent)
 
     updateThread->start();
 
+    // Update the GUI
     connect(updateThreadWorker, &UpdateThread::afterUpdate, this, [&](){
         for (GargoyleProfile *profile : _profiles)
         {
             if (profile->deviceProfile && profile->isUpdated())
             {
                 Usage usage = profile->getUsage();
-                int32_t usagePercent = (usage.current * 100) / usage.max;
+                int32_t usagePercentInt = (usage.current * 100) / usage.max;
 
                 // Clamp the percentage to reasonable values
-                usageBar->setValue(std::max(0, std::min(100, usagePercent)));
+                usageBar->setValue(std::max(0, std::min(100, usagePercentInt)));
+
+                // Now set progress bar display
+                /*
+                 * KB = B >> 10
+                 * MB = KB >> 10 = B >> 20
+                 * GB = MB >> 10 = KB >> 20 = B >> 30
+                 */
+
+                // double usagePercentDouble = static_cast<double>(usage.current * 100.0) / static_cast<double>(usage.max);
+                // usagePercentDouble = std::round(usagePercentDouble * 100.0) / 100.0; // Precise to 2 decimal places
+                double usagePercentDouble = MathHelper::percentage(usage.current, usage.max);
+
+                // Current usage in gb
+                double currentUsage = MathHelper::decimalPoint(MathHelper::ratio(usage.current, 1073741824)); // 1073741824 == 2^30 (bytes to gb)
+                // Max usage in gb
+                double maxUsage = MathHelper::decimalPoint(MathHelper::ratio(usage.max, 1073741824));
+                // Download speed in megabits per second
+                double speed = MathHelper::decimalPoint(MathHelper::ratio(profile->getUsagePerSecond(), 131072)); // 131072 == (bytes to megabytes) 2^20 / 2^3 (bytes to bits)
+
+                usageBar->setText(QString::number(usagePercentDouble) + "% (" + QString::number(currentUsage) + "/" + QString::number(maxUsage) + "GB) (" + QString::number(speed) + "Mb/s" + ")");
                 return;
             }
         }

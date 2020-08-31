@@ -11,7 +11,6 @@ UsageGraph::UsageGraph(MainWindow *main) : main(main)
     chart->setMargins(QMargins(0, 0, 0, 0));
 
     chart->createDefaultAxes();
-
     /*
     QValueAxis *axisX = new QValueAxis();
     axisX->setTickCount(20);
@@ -32,7 +31,7 @@ UsageGraph::UsageGraph(MainWindow *main) : main(main)
     //series->attachAxis(axisY);
 
     this->setContentsMargins(0, 0, 0, 0);
-
+    this->setRenderHint(QPainter::Antialiasing);
     this->setChart(chart);
 }
 

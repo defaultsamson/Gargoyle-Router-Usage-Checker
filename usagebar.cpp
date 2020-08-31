@@ -43,7 +43,7 @@ void UsageBar::paintEvent(QPaintEvent *) {
 
     // Fill
     qreal percentageValue = static_cast<qreal>(value() - minimum()) / static_cast<qreal>(maximum() - minimum());
-    QColor fillColour = palette().color(QPalette::Highlight);
+    QColor fillColour = palette().color(QPalette::Active, QPalette::Highlight);
     //painter.setBrush(fillColour);
     //painter.drawRoundedRect(0, 0, rect().width() * percentageValue, rect().height(), CORNER_ROUND_RADIUS, CORNER_ROUND_RADIUS);
     painter.fillRect(BORDER_THICKNESS, BORDER_THICKNESS, (rect().width() * percentageValue) - (2 * BORDER_THICKNESS), rect().height() - (2 * BORDER_THICKNESS), fillColour);

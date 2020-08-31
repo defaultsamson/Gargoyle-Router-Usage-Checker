@@ -7,7 +7,7 @@
 enum GargoyleLineType
 {
     CURRENT_IP,
-    QUOTA_LIMITS,
+    QUOTA_LIMIT,
     QUOTA_USED
 };
 

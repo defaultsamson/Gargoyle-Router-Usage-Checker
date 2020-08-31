@@ -56,7 +56,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
         if (line.startsWith("var connectedIp", Qt::CaseInsensitive))
             lineType = GargoyleLineType::CURRENT_IP;
         else if (line.startsWith("quotaLimits", Qt::CaseInsensitive))
-            lineType = GargoyleLineType::QUOTA_LIMITS;
+            lineType = GargoyleLineType::QUOTA_LIMIT;
         else if (line.startsWith("quotaUsed", Qt::CaseInsensitive))
             lineType = GargoyleLineType::QUOTA_USED;
         else
@@ -76,7 +76,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
         }
 
         // Process limit or usage, since both lines use the same format
-        case GargoyleLineType::QUOTA_LIMITS:
+        case GargoyleLineType::QUOTA_LIMIT:
         case GargoyleLineType::QUOTA_USED:
         {
             // Remove extra characters and split into sections between brackets
@@ -122,7 +122,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
                     {
                         switch (lineType)
                         {
-                        case GargoyleLineType::QUOTA_LIMITS:
+                        case GargoyleLineType::QUOTA_LIMIT:
                         {
                             rangeUsages[rangeKey].max = downloadData;
                             break;
@@ -145,7 +145,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
 
                         switch (lineType)
                         {
-                        case GargoyleLineType::QUOTA_LIMITS:
+                        case GargoyleLineType::QUOTA_LIMIT:
                         {
                             rangeUsage.max = downloadData;
                             break;

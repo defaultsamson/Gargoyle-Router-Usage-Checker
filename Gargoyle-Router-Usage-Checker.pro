@@ -1,4 +1,4 @@
-QT       += core gui network
+QT       += core gui network charts
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -22,7 +22,8 @@ SOURCES += \
     gargoyleprofile.cpp \
     main.cpp \
     mainwindow.cpp \
-    settings.cpp
+    settings.cpp \
+    usagegraph.cpp
 
 HEADERS += \
     IPUtil.h \
@@ -31,7 +32,8 @@ HEADERS += \
     gargoyleparser.h \
     gargoyleprofile.h \
     mainwindow.h \
-    settings.h
+    settings.h \
+    usagegraph.h
 
 FORMS += \
     dialogsettings.ui \

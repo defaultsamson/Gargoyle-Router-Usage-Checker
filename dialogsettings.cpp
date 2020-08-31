@@ -45,23 +45,27 @@ void DialogSettings::refreshTable(bool firstTime) {
     // Clear the table
     for (int i = t->rowCount() - 1; i >= 0; i--) t->removeRow(i);
 
-    //QList<uint64_t> rangeKeys = main->profiles().keys();
-    //for (int i = 0; i < rangeKeys.size(); ++i) {
-    //    GargoyleProfile *profile = main->profiles()[rangeKeys[i]];
     int tableI = 0;
-    for (int i = 0; i < main->profiles().size(); ++i) {
+    QList<uint64_t> rangeKeys = main->profiles().keys();
+    for (int i = 0; i < rangeKeys.size(); ++i) {
+        uint64_t range = rangeKeys[i];
+        GargoyleProfile *profile = main->profiles()[range];
 
-        // If the profile index has been queued for deletion, skip it and maintain the tableI
-        if (deletedIndexes.contains(i)) continue;
+        if (profileChanges.contains(range)) {
+            // If the profile index has been queued for deletion, skip  from the table (and maintain the tableI)
+            if (profileChanges[range].deleted)
+                continue;
+        } else {
+            // Create a Changes object if there isn't one
+            profileChanges[range] = Changes { false, profile->showInGraph, profile->name };
+        }
 
-        GargoyleProfile *profile = main->profiles().at(i);
+        Changes changes = profileChanges[range];
 
+        // 1. Create row
         t->insertRow(tableI);
-        ProfileCheckBox *checkBox = new ProfileCheckBox(i);
-        checkBox->setChecked(firstTime ? profile->showInGraph : checkedIndexes.contains(i));
-        // If it's being initialized, add the checkedIndex the first time
-        if (firstTime && profile->showInGraph) checkedIndexes.append(i);
 
+        // 2.1 Create first column layout
         QHBoxLayout *layout = new QHBoxLayout();
         layout->setContentsMargins(0, 0, 0, 0);
         layout->setAlignment(Qt::AlignCenter);
@@ -70,13 +74,26 @@ void DialogSettings::refreshTable(bool firstTime) {
         widget->setContentsMargins(0, 0, 0, 0);
         widget->setLayout(layout);
 
-        QObject::connect(checkBox, &ProfileCheckBox::checkEntry, this, [&](int index, bool checked){
-            if (checked)
-                this->checkedIndexes.append(index);
-            else
-                this->checkedIndexes.removeAll(index);
-        });
+        // 2.2 Choose whether to put a delete button or a checkbox
+        if (profile->isUpdated()) {
+            ProfileCheckBox *checkBox = new ProfileCheckBox(range);
+            checkBox->setChecked(changes.checked);
+            layout->addWidget(checkBox);
 
+            QObject::connect(checkBox, &ProfileCheckBox::checkEntry, this, [&](uint64_t range, bool checked){
+                this->profileChanges[range].checked = checked;
+            });
+        } else {
+            DeletePushButton *but = new DeletePushButton(range);
+            layout->addWidget(but);
+
+            QObject::connect(but, &DeletePushButton::deleteEntry, this, [&](uint64_t range){
+                this->profileChanges[range].deleted = true;
+                this->refreshTable();
+            });
+        }
+
+        // 3. Create IP Range
         QLabel *label = new QLabel(profile->displayIpRange);
 
         QHBoxLayout *layout2 = new QHBoxLayout();
@@ -88,22 +105,26 @@ void DialogSettings::refreshTable(bool firstTime) {
         widget2->setContentsMargins(0, 0, 0, 0);
         widget2->setLayout(layout2);
 
+        // 4. Create Name Edit
+        ProfileTextItem *textInput = new ProfileTextItem(range, profileChanges[range].name);
 
-        if (profile->updated) {
-            layout->addWidget(checkBox);
-        } else {
-            DeletePushButton *but = new DeletePushButton(i);
-            layout->addWidget(but);
+        QObject::connect(textInput, &ProfileTextItem::textChanged, this, [&](uint64_t range, QString text){
+            this->profileChanges[range].name = text;
+        });
 
-            QObject::connect(but, &DeletePushButton::deleteEntry, this, [&](int index){
-                this->deletedIndexes.append(index);
-                this->refreshTable();
-            });
-        }
+        QHBoxLayout *layout3 = new QHBoxLayout();
+        layout3->setContentsMargins(0, 0, 0, 0);
+        layout3->setAlignment(Qt::AlignCenter);
+        layout3->addWidget(textInput);
 
+        QWidget *widget3 = new QWidget();
+        widget3->setContentsMargins(0, 0, 0, 0);
+        widget3->setLayout(layout3);
+
+        // 5. Add all the widgets to the row
         t->setCellWidget(tableI, COL_CHECKBOX, widget);
         t->setCellWidget(tableI, COL_IP_RANGE, widget2);
-        t->setItem(tableI, COL_NAME, new QTableWidgetItem(profile->name));
+        t->setCellWidget(tableI, COL_NAME, widget3);
 
         tableI++;
     }
@@ -157,16 +178,19 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
-    //QList<uint64_t> rangeKeys = main->profiles().keys();
-    //for (int i = 0; i < checkboxes.size() && i < rangeKeys.size(); ++i) {
-    //    main->profiles()[rangeKeys[i]]->name = ui->tableWidget->item(i, COL_NAME)->text();
-    //    main->profiles()[rangeKeys[i]]->showInGraph = checkboxes.at(i)->isChecked();
-    // Set all as false
-    for (int i = 0; i < main->profiles().size(); ++i) main->profiles().at(i)->showInGraph = false;
-    // Then, set true based on the checked indexes
-    for (int i = 0; i < checkedIndexes.size(); ++i) {
-        int index = checkedIndexes.at(i);
-        main->profiles().at(index)->showInGraph = true;
+    QList<uint64_t> rangeKeys = profileChanges.keys();
+    for (int i = 0; i < rangeKeys.size(); i++) {
+        uint64_t range = rangeKeys[i];
+        if (main->profiles().contains(range) && profileChanges.contains(range)) {
+            GargoyleProfile *profile = main->profiles()[range];
+            Changes changes = profileChanges[range];
+            if (changes.deleted) {
+                main->profiles().remove(range);
+            } else {
+                profile->showInGraph = changes.checked;
+                profile->name = changes.name;
+            }
+        }
     }
 
     main->saveProfiles();

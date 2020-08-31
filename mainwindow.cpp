@@ -75,6 +75,21 @@ MainWindow::MainWindow(QWidget *parent)
     connect(updateThread, &QThread::finished, updateThread, &QThread::deleteLater);
 
     updateThread->start();
+
+    connect(updateThreadWorker, &UpdateThread::afterUpdate, this, [&](){
+        for (GargoyleProfile *profile : _profiles)
+        {
+            if (profile->deviceProfile && profile->isUpdated())
+            {
+                Usage usage = profile->getUsage();
+                ui->progressBar->setValue((usage.current * 100) / usage.max);
+                return;
+            }
+        }
+
+        // If no profile is found
+        ui->progressBar->setValue(0);
+    });
 }
 
 void MainWindow::saveProfiles() {

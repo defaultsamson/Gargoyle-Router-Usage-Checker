@@ -13,7 +13,7 @@ GargoyleParser::GargoyleParser()
 
 }
 
-bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profiles)
+bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profiles, QReadWriteLock &profileLock)
 {
     // Set up network manager
     QNetworkAccessManager manager;
@@ -37,11 +37,13 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
     }
 
     // Set all profiles to not updated and not the current device
+    profileLock.lockForWrite();
     for (GargoyleProfile *profile : profiles)
     {
         profile->setNotUpdated();
         profile->deviceProfile = false;
     }
+    profileLock.unlock();
 
     // For each HTML line, extract the current IP and profile data
     QMap<uint64_t, Usage> rangeUsages;
@@ -173,6 +175,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
         }
     }
 
+    profileLock.lockForWrite();
     // Add usages to profiles, creating profiles as needed
     for (uint64_t rangeKey : rangeUsages.keys())
     {
@@ -200,6 +203,7 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
         if (profile->containsIp(currentIp))
             profile->deviceProfile = true;
     }
+    profileLock.unlock();
 
     return true;
 }

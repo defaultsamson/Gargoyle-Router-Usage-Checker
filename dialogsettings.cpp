@@ -179,6 +179,7 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
     QList<uint64_t> rangeKeys = profileChanges.keys();
+    main->profileLock.lockForWrite();
     for (int i = 0; i < rangeKeys.size(); i++) {
         uint64_t range = rangeKeys[i];
         if (main->profiles().contains(range) && profileChanges.contains(range)) {
@@ -192,6 +193,7 @@ void DialogSettings::on_buttonBox_accepted()
             }
         }
     }
+    main->profileLock.unlock();
 
     main->saveProfiles();
     main->loadSettings();

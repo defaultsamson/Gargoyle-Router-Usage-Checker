@@ -264,7 +264,7 @@ void MainWindow::openOptions() {
     s.exec();
 }
 
-const QMap<uint64_t, GargoyleProfile*> &MainWindow::profiles() {
+QMap<uint64_t, GargoyleProfile*> &MainWindow::profiles() {
     return _profiles;
 }
 

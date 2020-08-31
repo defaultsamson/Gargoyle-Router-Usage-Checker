@@ -7,6 +7,8 @@
 #include <QHeaderView>
 #include <QTableWidgetItem>
 #include <algorithm>
+#include <QPushButton>
+#include <iostream>
 
 DialogSettings::DialogSettings(MainWindow *main) :
     QDialog(main),
@@ -35,30 +37,96 @@ DialogSettings::DialogSettings(MainWindow *main) :
     ui->spinBoxSeconds->setRange(1, 60 * 60); // From 1 second to 1 hour between updates
     ui->lineEditIP->setText(Settings::ROUTER_IP.value().toString());
 
-    // Test data
-    QTableWidget *t = ui->tableWidget;
+    refreshTable(true);
+}
 
+void DialogSettings::refreshTable(bool firstTime) {
+    QTableWidget *t = ui->tableWidget;
+    // Clear the table
+    for (int i = t->rowCount() - 1; i >= 0; i--) t->removeRow(i);
+
+    int tableI = 0;
     QList<uint64_t> rangeKeys = main->profiles().keys();
     for (int i = 0; i < rangeKeys.size(); ++i) {
-        GargoyleProfile *profile = main->profiles()[rangeKeys[i]];
+        uint64_t range = rangeKeys[i];
+        GargoyleProfile *profile = main->profiles()[range];
 
-        t->insertRow(i);
-        QCheckBox *checkBox = new QCheckBox();
-        checkBox->setChecked(profile->showInGraph);
-        checkboxes.append(checkBox);
+        if (profileChanges.contains(range)) {
+            // If the profile index has been queued for deletion, skip  from the table (and maintain the tableI)
+            if (profileChanges[range].deleted)
+                continue;
+        } else {
+            // Create a Changes object if there isn't one
+            profileChanges[range] = Changes { false, profile->showInGraph, profile->name };
+        }
 
+        Changes changes = profileChanges[range];
+
+        // 1. Create row
+        t->insertRow(tableI);
+
+        // 2.1 Create first column layout
         QHBoxLayout *layout = new QHBoxLayout();
         layout->setContentsMargins(0, 0, 0, 0);
-        layout->addWidget(checkBox);
         layout->setAlignment(Qt::AlignCenter);
 
         QWidget *widget = new QWidget();
         widget->setContentsMargins(0, 0, 0, 0);
         widget->setLayout(layout);
 
-        t->setCellWidget(i, COL_CHECKBOX, widget);
-        t->setCellWidget(i, COL_IP_RANGE, new QLabel(profile->displayIpRange));
-        t->setItem(i, COL_NAME, new QTableWidgetItem(profile->name));
+        // 2.2 Choose whether to put a delete button or a checkbox
+        if (profile->isUpdated()) {
+            ProfileCheckBox *checkBox = new ProfileCheckBox(range);
+            checkBox->setChecked(changes.checked);
+            layout->addWidget(checkBox);
+
+            QObject::connect(checkBox, &ProfileCheckBox::checkEntry, this, [&](uint64_t range, bool checked){
+                this->profileChanges[range].checked = checked;
+            });
+        } else {
+            DeletePushButton *but = new DeletePushButton(range);
+            layout->addWidget(but);
+
+            QObject::connect(but, &DeletePushButton::deleteEntry, this, [&](uint64_t range){
+                this->profileChanges[range].deleted = true;
+                this->refreshTable();
+            });
+        }
+
+        // 3. Create IP Range
+        QLabel *label = new QLabel(profile->displayIpRange);
+
+        QHBoxLayout *layout2 = new QHBoxLayout();
+        layout2->setContentsMargins(0, 0, 0, 0);
+        layout2->setAlignment(Qt::AlignCenter);
+        layout2->addWidget(label);
+
+        QWidget *widget2 = new QWidget();
+        widget2->setContentsMargins(0, 0, 0, 0);
+        widget2->setLayout(layout2);
+
+        // 4. Create Name Edit
+        ProfileTextItem *textInput = new ProfileTextItem(range, profileChanges[range].name);
+
+        QObject::connect(textInput, &ProfileTextItem::textChanged, this, [&](uint64_t range, QString text){
+            this->profileChanges[range].name = text;
+        });
+
+        QHBoxLayout *layout3 = new QHBoxLayout();
+        layout3->setContentsMargins(0, 0, 0, 0);
+        layout3->setAlignment(Qt::AlignCenter);
+        layout3->addWidget(textInput);
+
+        QWidget *widget3 = new QWidget();
+        widget3->setContentsMargins(0, 0, 0, 0);
+        widget3->setLayout(layout3);
+
+        // 5. Add all the widgets to the row
+        t->setCellWidget(tableI, COL_CHECKBOX, widget);
+        t->setCellWidget(tableI, COL_IP_RANGE, widget2);
+        t->setCellWidget(tableI, COL_NAME, widget3);
+
+        tableI++;
     }
 }
 
@@ -110,10 +178,19 @@ void DialogSettings::on_buttonBox_accepted()
     Settings::UPDATE_SECONDS.setValue(ui->spinBoxSeconds->value());
     Settings::ROUTER_IP.setValue(ui->lineEditIP->text());
 
-    QList<uint64_t> rangeKeys = main->profiles().keys();
-    for (int i = 0; i < checkboxes.size() && i < rangeKeys.size(); ++i) {
-        main->profiles()[rangeKeys[i]]->name = ui->tableWidget->item(i, COL_NAME)->text();
-        main->profiles()[rangeKeys[i]]->showInGraph = checkboxes.at(i)->isChecked();
+    QList<uint64_t> rangeKeys = profileChanges.keys();
+    for (int i = 0; i < rangeKeys.size(); i++) {
+        uint64_t range = rangeKeys[i];
+        if (main->profiles().contains(range) && profileChanges.contains(range)) {
+            GargoyleProfile *profile = main->profiles()[range];
+            Changes changes = profileChanges[range];
+            if (changes.deleted) {
+                main->profiles().remove(range);
+            } else {
+                profile->showInGraph = changes.checked;
+                profile->name = changes.name;
+            }
+        }
     }
 
     main->saveProfiles();

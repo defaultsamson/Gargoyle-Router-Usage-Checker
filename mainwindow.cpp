@@ -95,6 +95,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Update the GUI
     connect(updateThreadWorker, &UpdateThread::afterUpdate, this, [&](){
+        profileLock.lockForRead();
         for (GargoyleProfile *profile : _profiles)
         {
             if (profile->deviceProfile && profile->isUpdated())
@@ -124,9 +125,12 @@ MainWindow::MainWindow(QWidget *parent)
                 double speed = MathHelper::decimalPoint(MathHelper::ratio(profile->getUsagePerSecond(), 131072)); // 131072 == (bytes to megabytes) 2^20 / 2^3 (bytes to bits)
 
                 usageBar->setText(QString::number(usagePercentDouble) + "% (" + QString::number(currentUsage) + "/" + QString::number(maxUsage) + "GB) (" + QString::number(speed) + "Mb/s" + ")");
+
+                profileLock.unlock();
                 return;
             }
         }
+        profileLock.unlock();
 
         // If no profile is found
         usageBar->reset();

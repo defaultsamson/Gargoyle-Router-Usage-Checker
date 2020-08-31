@@ -23,7 +23,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     settings.cpp \
-    usagegraph.cpp
+    usagegraph.cpp \
+    updatethread.cpp
 
 HEADERS += \
     IPUtil.h \
@@ -33,7 +34,8 @@ HEADERS += \
     gargoyleprofile.h \
     mainwindow.h \
     settings.h \
-    usagegraph.h
+    usagegraph.h \
+    updatethread.h
 
 FORMS += \
     dialogsettings.ui \

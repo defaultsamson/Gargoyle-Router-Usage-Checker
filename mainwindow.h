@@ -3,11 +3,13 @@
 
 #include "gargoyleparser.h"
 #include "gargoyleprofile.h"
+#include "updatethread.h"
 
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QCloseEvent>
 #include <QShowEvent>
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,9 +54,14 @@ private:
     GargoyleParser parser;
     QMap<uint64_t, GargoyleProfile*> _profiles;
 
+    QThread *updateThread;
+    UpdateThread *updateThreadWorker;
+
 private slots:
     void showContextMenu(const QPoint &pos);
-    void updateData();
     void openOptions();
+
+signals:
+    void updateProfiles();
 };
 #endif // MAINWINDOW_H

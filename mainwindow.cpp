@@ -11,6 +11,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QThread>
 
 #include "dialogsettings.h"
 #include "settings.h"
@@ -18,6 +19,7 @@
 #include "gargoyleprofile.h"
 #include "fileutil.h"
 #include "IPUtil.h"
+#include "updatethread.h"
 
 const QString MainWindow::JSON_PROFILES = "profiles";
 const QString MainWindow::JSON_IP_RANGE = "ip_range";
@@ -63,6 +65,16 @@ MainWindow::MainWindow(QWidget *parent)
     darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText, QColor(127, 127, 127));
 
     loadSettings(true);
+
+    updateThread = new QThread();
+    updateThreadWorker = new UpdateThread(&parser, this);
+    updateThreadWorker->moveToThread(updateThread);
+
+    connect(updateThread, &QThread::started, updateThreadWorker, &UpdateThread::startUpdateLoop);
+    connect(updateThread, &QThread::finished, updateThreadWorker, &UpdateThread::stopUpdateLoop);
+    connect(updateThread, &QThread::finished, updateThread, &QThread::deleteLater);
+
+    updateThread->start();
 }
 
 void MainWindow::saveProfiles() {
@@ -143,6 +155,8 @@ void MainWindow::loadSettings(bool initial) {
             _profiles[range] = profile;
         }
     }
+
+    emit updateProfiles();
 }
 
 void MainWindow::setDarkTheme(bool set) {
@@ -227,7 +241,9 @@ void MainWindow::showContextMenu(const QPoint &pos) {
     QMenu contextMenu(tr("Context menu"), this);
 
     QAction action1("Update", this);
-    connect(&action1, SIGNAL(triggered()), this, SLOT(updateData()));
+    connect(&action1, &QAction::triggered, this, [&](){
+        emit updateProfiles();
+    });
     contextMenu.addAction(&action1);
 
     QAction action2("Settings", this);
@@ -239,24 +255,6 @@ void MainWindow::showContextMenu(const QPoint &pos) {
     contextMenu.addAction(&action3);
 
     contextMenu.exec(mapToGlobal(pos));
-}
-
-void MainWindow::updateData() {
-    if (parser.update(Settings::ROUTER_IP.value().toString(), _profiles))
-    {
-        for (GargoyleProfile *profile : _profiles)
-        {
-            if (profile->isUpdated())
-            {
-                Usage usage = profile->getUsage();
-                qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns (%lld bytes/s)", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count(), profile->getUsagePerSecond());
-            }
-            else
-            {
-                qDebug("Range \"%s\": Not updated", qUtf8Printable(profile->name));
-            }
-        }
-    }
 }
 
 void MainWindow::openOptions() {
@@ -273,5 +271,9 @@ MainWindow::~MainWindow()
     delete ui;
 
     delete Settings::QSETTINGS;
+
+    updateThread->quit();
+    delete updateThread;
+    delete updateThreadWorker;
 }
 

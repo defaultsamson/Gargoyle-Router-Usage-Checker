@@ -25,7 +25,8 @@ jobs:
         dir: . # optional
         # Version of Qt to install
         version: ${{ env.QT_VERSION }} # optional, default is 5.12.9
-        
+        modules: qtcharts
+
     - name: Build
       run: |
         ./Qt/${{ env.QT_VERSION }}/gcc_64/bin/qmake *.pro
@@ -44,6 +45,7 @@ jobs:
         # Version of Qt to install
         version: ${{ env.QT_VERSION }} # optional, default is 5.12.9
         arch: win64_mingw81
+        modules: qtcharts
         
     - name: Build
       run: | # cd ../Qt/Tools/mingw810_64/bin

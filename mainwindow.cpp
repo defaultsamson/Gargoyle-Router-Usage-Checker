@@ -147,6 +147,7 @@ void MainWindow::saveProfiles() {
 
     // Creates an array of profiles
     QJsonArray profiles;
+    profileLock.lockForRead();
     for (GargoyleProfile *profile : _profiles) {
         QJsonObject p;
 
@@ -156,6 +157,7 @@ void MainWindow::saveProfiles() {
 
         profiles.append(p);
     }
+    profileLock.unlock();
 
     json[JSON_PROFILES] = profiles;
 
@@ -179,6 +181,8 @@ void MainWindow::loadSettings(bool initial) {
 
     // Load profiles
     if (initial) {
+        profileLock.lockForWrite();
+
         // Clear previous profiles
         for (GargoyleProfile *profile : _profiles) delete profile;
         _profiles.clear();
@@ -210,6 +214,7 @@ void MainWindow::loadSettings(bool initial) {
 
             _profiles[range] = profile;
         }
+        profileLock.unlock();
     }
 
     emit updateProfiles();

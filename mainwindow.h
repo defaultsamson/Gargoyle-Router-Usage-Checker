@@ -29,6 +29,7 @@ public:
     void saveProfiles();
     void loadSettings(bool initial = false);
 
+    QReadWriteLock profileLock;
     QMap<uint64_t, GargoyleProfile*> &profiles();
 
     void mousePress(QMouseEvent *event);

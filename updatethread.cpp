@@ -24,32 +24,41 @@ void UpdateThread::runUpdateLoop()
 {
     timer.stop();
 
-    qDebug("Updating usages...");
-    if (parser->update(Settings::ROUTER_IP.value().toString(), mainWindow->profiles()))
+    if (mainWindow->profileLock.tryLockForWrite())
     {
-        qDebug("Successfully updated usages");
-
-        // Print profiles to console
-        for (GargoyleProfile *profile : mainWindow->profiles())
+        qDebug("Updating usages...");
+        if (parser->update(Settings::ROUTER_IP.value().toString(), mainWindow->profiles()))
         {
-            if (profile->isUpdated())
-            {
-                Usage usage = profile->getUsage();
-                qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns (%lld bytes/s)", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count(), profile->getUsagePerSecond());
-            }
-            else
-            {
-                qDebug("Range \"%s\": Not updated", qUtf8Printable(profile->name));
-            }
-        }
+            qDebug("Successfully updated usages");
 
-        emit afterUpdate();
+            // Print profiles to console
+            for (GargoyleProfile *profile : mainWindow->profiles())
+            {
+                if (profile->isUpdated())
+                {
+                    Usage usage = profile->getUsage();
+                    qDebug("Range \"%s\": %llu bytes / %llu bytes at %lld bytes / %lld ns (%lld bytes/s)", qUtf8Printable(profile->name), usage.current, usage.max, profile->getUsageDelta(), profile->getTimeDelta().count(), profile->getUsagePerSecond());
+                }
+                else
+                {
+                    qDebug("Range \"%s\": Not updated", qUtf8Printable(profile->name));
+                }
+            }
+            mainWindow->profileLock.unlock();
+
+            emit afterUpdate();
+        }
+        else
+        {
+            qDebug("Failed to update usages");
+            mainWindow->profileLock.unlock();
+
+            emit updateError();
+        }
     }
     else
     {
-        qDebug("Failed to update usages");
-
-        emit updateError();
+        qDebug("Failed to lock profiles");
     }
 
     if (loopActive)

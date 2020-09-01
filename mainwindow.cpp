@@ -69,17 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->centralwidget->layout()->addWidget(graph);
 
     usageBar = new UsageBar();
-
-    QHBoxLayout *layout = new QHBoxLayout();
-    layout->setContentsMargins(6, 0, 6, 6);
-    layout->setAlignment(Qt::AlignCenter);
-    layout->addWidget(usageBar);
-
-    QWidget *widget = new QWidget();
-    widget->setContentsMargins(0, 0, 0, 0);
-    widget->setLayout(layout);
-
-    ui->centralwidget->layout()->addWidget(widget);
+    ui->centralwidget->layout()->addWidget(usageBar);
 
     loadSettings(true);
 

@@ -9,6 +9,8 @@ UsageGraph::UsageGraph(MainWindow *main) : main(main)
     QChart *chart = new QChart();
     chart->legend()->hide();
     chart->setMargins(QMargins(0, 0, 0, 0));
+    chart->layout()->setContentsMargins(0, 0, 0, 0);
+    chart->setBackgroundRoundness(0);
 
     chart->createDefaultAxes();
     /*
@@ -25,6 +27,7 @@ UsageGraph::UsageGraph(MainWindow *main) : main(main)
 
     QSplineSeries *series = new QSplineSeries();
     *series << QPointF(1, 5) << QPointF(3.5, 18) << QPointF(4.8, 7.5) << QPointF(10, 2.5);
+    //series->poin
     //series->setPen(QPen(QColor(255, 100, 100)));
     chart->addSeries(series);
     //series->attachAxis(axisX);

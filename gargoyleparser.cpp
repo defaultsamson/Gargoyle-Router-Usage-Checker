@@ -179,13 +179,14 @@ bool GargoyleParser::update(QString url, QMap<uint64_t, GargoyleProfile*> &profi
     // Add usages to profiles, creating profiles as needed
     for (uint64_t rangeKey : rangeUsages.keys())
     {
-        if (profiles.contains(rangeKey))
+        GargoyleProfile *profile = profiles.value(rangeKey, nullptr);
+        if (profile != nullptr)
         {
-            profiles[rangeKey]->setUsage(rangeUsages[rangeKey]);
+            profile->setUsage(rangeUsages[rangeKey]);
         }
         else
         {
-            GargoyleProfile *profile = new GargoyleProfile(rangeKey);
+            profile = new GargoyleProfile(rangeKey);
 
             QString ipRange = IPUtil::ipRangeToString(rangeKey);
             profile->name = ipRange;

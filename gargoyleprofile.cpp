@@ -45,6 +45,11 @@ uint32_t GargoyleProfile::getMaxIp() const
     return maxIp;
 }
 
+uint64_t GargoyleProfile::getIpRange() const
+{
+    return IPUtil::createIpRange(minIp, maxIp);
+}
+
 bool GargoyleProfile::isUpdated() const
 {
     return updated;

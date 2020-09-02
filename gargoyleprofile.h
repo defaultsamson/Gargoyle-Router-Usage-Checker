@@ -38,6 +38,8 @@ public:
     uint32_t getMinIp() const;
     uint32_t getMaxIp() const;
 
+    uint64_t getIpRange() const;
+
     bool isUpdated() const;
     void setNotUpdated();
 

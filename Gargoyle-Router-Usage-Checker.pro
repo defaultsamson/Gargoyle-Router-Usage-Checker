@@ -22,6 +22,7 @@ SOURCES += \
     gargoyleprofile.cpp \
     main.cpp \
     mainwindow.cpp \
+    profileusagebar.cpp \
     settings.cpp \
     usagebar.cpp \
     usagegraph.cpp \
@@ -35,6 +36,7 @@ HEADERS += \
     iputil.h \
     mainwindow.h \
     mathhelper.h \
+    profileusagebar.h \
     settings.h \
     usagebar.h \
     usagegraph.h \

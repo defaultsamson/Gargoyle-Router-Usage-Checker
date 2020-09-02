@@ -6,6 +6,7 @@
 #include "updatethread.h"
 #include "usagegraph.h"
 #include "usagebar.h"
+#include "profileusagebar.h"
 
 #include <QMainWindow>
 #include <QMouseEvent>
@@ -47,7 +48,8 @@ protected:
 private:
     Ui::MainWindow *ui;
     UsageGraph *graph;
-    UsageBar *usageBar;
+    ProfileUsageBar *usageBar;
+    QList<ProfileUsageBar*> extendedUsageBars;
 
     static const QString JSON_PROFILES;
     static const QString JSON_IP_RANGE;

@@ -10,8 +10,6 @@ UpdateThread::UpdateThread(GargoyleParser *parser, MainWindow *mainWindow)
 
     this->parser = parser;
     this->mainWindow = mainWindow;
-
-    connect(mainWindow, &MainWindow::updateProfiles, this, &UpdateThread::runUpdateLoop);
 }
 
 void UpdateThread::startUpdateLoop()

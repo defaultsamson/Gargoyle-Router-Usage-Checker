@@ -49,6 +49,8 @@ private:
     Ui::MainWindow *ui;
     UsageGraph *graph;
     ProfileUsageBar *usageBar;
+
+    QPushButton *extendButton;
     QList<ProfileUsageBar*> extendedUsageBars;
 
     static const QString JSON_PROFILES;

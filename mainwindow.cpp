@@ -81,22 +81,47 @@ MainWindow::MainWindow(QWidget *parent)
     usageBar = new ProfileUsageBar(updateThreadWorker, 0, this);
     ui->centralwidget->layout()->addWidget(usageBar);
 
-    QPushButton *expandButton = new QPushButton();
+    extendButton = new QPushButton();
 
-    expandButton->setFixedHeight(16);
-    expandButton->setFlat(true);
-    expandButton->setText("˅˄");
+    extendButton->setFixedHeight(16);
+    extendButton->setCheckable(true);
+    extendButton->setChecked(false);
+    extendButton->setFlat(true);
+    extendButton->setText("˅");
 
-    connect(expandButton, &QPushButton::pressed, this, [&](){
+    connect(extendButton, &QPushButton::toggled, this, [&](bool checked){
         qDebug("Expand button pressed");
+        if (checked)
+        {
+            extendButton->setText("˄");
+
+            profileLock.lockForRead();
+            for (GargoyleProfile *profile : _profiles)
+            {
+                if (profile->isUpdated() && profile->showInGraph)
+                {
+                    ProfileUsageBar *newUsageBar = new ProfileUsageBar(updateThreadWorker, profile->getIpRange(), this);
+                    extendedUsageBars.append(newUsageBar);
+
+                    ui->centralwidget->layout()->addWidget(newUsageBar);
+                }
+            }
+            profileLock.unlock();
+        }
+        else
+        {
+            extendButton->setText("˅");
+
+            for (ProfileUsageBar *bar : extendedUsageBars)
+            {
+                ui->centralwidget->layout()->removeWidget(bar);
+                delete bar;
+            }
+            extendedUsageBars.clear();
+        }
     });
 
-    ui->centralwidget->layout()->addWidget(expandButton);
-
-    ProfileUsageBar *newUsageBar = new ProfileUsageBar(updateThreadWorker, 13882347452329623918U, this);
-    extendedUsageBars.append(newUsageBar);
-
-    ui->centralwidget->layout()->addWidget(newUsageBar);
+    ui->centralwidget->layout()->addWidget(extendButton);
 
     // Load settings
     loadSettings(true);
